@@ -106,4 +106,20 @@ public class MyBatisGeneratorTest {
             throw e;
         }
     }
+    
+    @Test
+    public void testGenerateServiceCode() throws Exception{
+    	List<String> warnings = new ArrayList<String>();
+    	ConfigurationParser cp = new ConfigurationParser(warnings);
+        Configuration config = cp.parseConfiguration(JavaCodeGenerationTest.class.getResourceAsStream("/scripts/generatorConfig1.xml"));
+        
+        DefaultShellCallback shellCallback = new DefaultShellCallback(true);
+        
+        try {
+            MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, shellCallback, warnings);
+            myBatisGenerator.generate(null, null, null, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
 }

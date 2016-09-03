@@ -69,6 +69,9 @@ public class Context extends PropertyHolder {
 
     /** The java client generator configuration. */
     private JavaClientGeneratorConfiguration javaClientGeneratorConfiguration;
+    
+    /** The java service generator configuration. */
+    private JavaServiceGeneratorConfiguration javaServiceGeneratorConfiguration;
 
     /** The table configurations. */
     private ArrayList<TableConfiguration> tableConfigurations;
@@ -155,6 +158,15 @@ public class Context extends PropertyHolder {
     public JavaClientGeneratorConfiguration getJavaClientGeneratorConfiguration() {
         return javaClientGeneratorConfiguration;
     }
+    
+    /**
+     * Gets the java client generator configuration.
+     *
+     * @return the java client generator configuration
+     */
+    public JavaServiceGeneratorConfiguration getJavaServiceGeneratorConfiguration() {
+        return javaServiceGeneratorConfiguration;
+    }
 
     /**
      * Gets the java model generator configuration.
@@ -227,6 +239,10 @@ public class Context extends PropertyHolder {
         if (javaClientGeneratorConfiguration != null) {
             javaClientGeneratorConfiguration.validate(errors, id);
         }
+        
+        if (javaServiceGeneratorConfiguration != null) {
+            javaServiceGeneratorConfiguration.validate(errors, id);
+        }
 
         IntrospectedTable it = null;
         try {
@@ -286,6 +302,10 @@ public class Context extends PropertyHolder {
     public void setJavaClientGeneratorConfiguration(
             JavaClientGeneratorConfiguration javaClientGeneratorConfiguration) {
         this.javaClientGeneratorConfiguration = javaClientGeneratorConfiguration;
+    }
+    
+    public void setJavaServiceGeneratorConfiguration(JavaServiceGeneratorConfiguration javaServiceGeneratorConfiguration) {
+    	this.javaServiceGeneratorConfiguration = javaServiceGeneratorConfiguration;
     }
 
     /**
@@ -401,6 +421,10 @@ public class Context extends PropertyHolder {
 
         if (javaClientGeneratorConfiguration != null) {
             xmlElement.addElement(javaClientGeneratorConfiguration.toXmlElement());
+        }
+        
+        if (javaServiceGeneratorConfiguration != null) {
+        	xmlElement.addElement(javaServiceGeneratorConfiguration.toXmlElement());
         }
 
         for (TableConfiguration tableConfiguration : tableConfigurations) {

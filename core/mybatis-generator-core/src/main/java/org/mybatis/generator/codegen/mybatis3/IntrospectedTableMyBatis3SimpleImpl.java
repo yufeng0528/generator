@@ -22,6 +22,7 @@ import org.mybatis.generator.codegen.AbstractJavaClientGenerator;
 import org.mybatis.generator.codegen.AbstractJavaGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.SimpleAnnotatedClientGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.SimpleJavaClientGenerator;
+import org.mybatis.generator.codegen.mybatis3.javamapper.SimpleJavaServiceGenerator;
 import org.mybatis.generator.codegen.mybatis3.model.SimpleModelGenerator;
 import org.mybatis.generator.codegen.mybatis3.xmlmapper.SimpleXMLMapperGenerator;
 import org.mybatis.generator.internal.ObjectFactory;
@@ -32,6 +33,7 @@ import org.mybatis.generator.internal.ObjectFactory;
  * 
  */
 public class IntrospectedTableMyBatis3SimpleImpl extends IntrospectedTableMyBatis3Impl {
+		
     public IntrospectedTableMyBatis3SimpleImpl() {
         super();
     }
@@ -50,6 +52,27 @@ public class IntrospectedTableMyBatis3SimpleImpl extends IntrospectedTableMyBati
         
         initializeAbstractGenerator(xmlMapperGenerator, warnings,
                 progressCallback);
+    }
+    
+    protected AbstractJavaClientGenerator calculateClientGenerators(List<String> warnings,
+            ProgressCallback progressCallback) {
+        if (!rules.generateJavaClient()) {
+            return null;
+        }
+        
+        AbstractJavaClientGenerator javaGenerator = createJavaClientGenerator();
+        if (javaGenerator == null) {
+            return null;
+        }
+
+        initializeAbstractGenerator(javaGenerator, warnings, progressCallback);
+        clientGenerators.add(javaGenerator);
+        
+        javaGenerator = new SimpleJavaServiceGenerator();
+        initializeAbstractGenerator(javaGenerator, warnings, progressCallback);
+        clientGenerators.add(javaGenerator);
+        
+        return javaGenerator;
     }
 
     @Override

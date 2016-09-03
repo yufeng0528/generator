@@ -29,6 +29,7 @@ import org.mybatis.generator.config.Context;
 import org.mybatis.generator.config.GeneratedKey;
 import org.mybatis.generator.config.JavaClientGeneratorConfiguration;
 import org.mybatis.generator.config.JavaModelGeneratorConfiguration;
+import org.mybatis.generator.config.JavaServiceGeneratorConfiguration;
 import org.mybatis.generator.config.ModelType;
 import org.mybatis.generator.config.PropertyHolder;
 import org.mybatis.generator.config.PropertyRegistry;
@@ -174,7 +175,10 @@ public abstract class IntrospectedTable {
         ATTR_MYBATIS3_UPDATE_BY_EXAMPLE_WHERE_CLAUSE_ID,
         
         /** The ATT r_ mybati s3_ sq l_ provide r_ type. */
-        ATTR_MYBATIS3_SQL_PROVIDER_TYPE
+        ATTR_MYBATIS3_SQL_PROVIDER_TYPE,
+        
+        /**The ATT service fileName */
+        ATTR_MYBATIS3_JAVA_SERVICE_TYPE,
     }
 
     /** The table configuration. */
@@ -1312,6 +1316,21 @@ public abstract class IntrospectedTable {
 
         return sb.toString();
     }
+    
+    protected String calculateJavaServicePackage() {
+        JavaServiceGeneratorConfiguration config = context
+                .getJavaServiceGeneratorConfiguration();
+        if (config == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(config.getTargetPackage());
+
+        sb.append(fullyQualifiedTable.getSubPackageForClientOrSqlMap(isSubPackagesEnabled(config)));
+
+        return sb.toString();
+    }
 
     /**
      * Calculate java client attributes.
@@ -1356,6 +1375,17 @@ public abstract class IntrospectedTable {
             sb.append("SqlProvider"); //$NON-NLS-1$
         }
         setMyBatis3SqlProviderType(sb.toString());
+        
+        sb.setLength(0);
+        sb.append(calculateJavaServicePackage());
+        sb.append('.');
+        if (stringHasValue(tableConfiguration.getSqlProviderName())) {
+            sb.append(tableConfiguration.getSqlProviderName());
+        } else {
+            sb.append(fullyQualifiedTable.getDomainObjectName());
+            sb.append("Service"); //$NON-NLS-1$
+        }
+        setMyBatis3JavaServiceType(sb.toString());
     }
 
     /**
@@ -1827,6 +1857,24 @@ public abstract class IntrospectedTable {
         internalAttributes.put(
                 InternalAttribute.ATTR_MYBATIS3_SQL_PROVIDER_TYPE,
                 mybatis3SqlProviderType);
+    }
+    
+    /**
+     * Gets the mybatis3 Serivce Type
+     * @return
+     */
+    public String getMyBatis3JavaServiceType(){
+    	return internalAttributes.get(InternalAttribute.ATTR_MYBATIS3_JAVA_SERVICE_TYPE);
+    }
+    
+    /**
+     * Sets the mybatis3 Serivce Type
+     * @param myBatis3JavaServiceType
+     */
+    public void setMyBatis3JavaServiceType(String myBatis3JavaServiceType){
+    	internalAttributes.put(
+                InternalAttribute.ATTR_MYBATIS3_JAVA_SERVICE_TYPE,
+                myBatis3JavaServiceType);
     }
     
     /**

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!--
+
+       Copyright 2006-2016 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+<!DOCTYPE generatorConfiguration  
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"  
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">  
+<generatorConfiguration>  
+    <context id="psSQLTables"  targetRuntime="MyBatis3Simple">  
+        <commentGenerator>  
+            <property name="suppressDate" value="true"/>  
+            <property name="suppressAllComments" value="true"/>  
+        </commentGenerator>  
+        <jdbcConnection driverClass="org.postgresql.Driver" connectionURL="jdbc:postgresql://121.40.226.188:5432/trymore" userId="postgre" password="postgre">  
+        </jdbcConnection>  
+        <javaTypeResolver>  
+            <property name="forceBigDecimals" value="false"/>  
+        </javaTypeResolver>  
+        <javaModelGenerator targetPackage="com.trymore.pifa.domain" targetProject="src">  
+            <property name="enableSubPackages" value="false"/>  
+            <property name="trimStrings" value="true"/>  
+        </javaModelGenerator>  
+        <sqlMapGenerator targetPackage="mapper" targetProject="src">  
+            <property name="enableSubPackages" value="false"/>  
+        </sqlMapGenerator>  
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.trymore.pifa.mapper" targetProject="src">  
+            <property name="enableSubPackages" value="false"/>  
+        </javaClientGenerator> 
+        <javaServiceGenerator targetPackage="com.trymore.pifa.service" targetProject="/Users/fengyu/Downloads/java/jar/com">  
+            <property name="enableSubPackages" value="false"/>  
+        </javaServiceGenerator> 
+
+      
+        <table tableName="conf_area" domainObjectName="ConfArea" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true" selectByExampleQueryId="false" schema="pifa"></table>
+		
+		
+    </context>  
+</generatorConfiguration>  

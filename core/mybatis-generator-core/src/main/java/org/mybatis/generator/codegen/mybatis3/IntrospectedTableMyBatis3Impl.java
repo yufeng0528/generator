@@ -31,6 +31,7 @@ import org.mybatis.generator.codegen.AbstractXmlGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.AnnotatedClientGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.JavaMapperGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.MixedClientGenerator;
+import org.mybatis.generator.codegen.mybatis3.javamapper.SimpleJavaServiceGenerator;
 import org.mybatis.generator.codegen.mybatis3.model.BaseRecordGenerator;
 import org.mybatis.generator.codegen.mybatis3.model.ExampleGenerator;
 import org.mybatis.generator.codegen.mybatis3.model.PrimaryKeyGenerator;
@@ -52,6 +53,9 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
     /** The client generators. */
     protected List<AbstractJavaGenerator> clientGenerators;
     
+    /** The service generators. */
+	protected List<AbstractJavaGenerator> serviceGenerators;
+    
     /** The xml mapper generator. */
     protected AbstractXmlGenerator xmlMapperGenerator;
 
@@ -62,6 +66,7 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
         super(TargetRuntime.MYBATIS3);
         javaModelGenerators = new ArrayList<AbstractJavaGenerator>();
         clientGenerators = new ArrayList<AbstractJavaGenerator>();
+        serviceGenerators = new ArrayList<AbstractJavaGenerator>();
     }
 
     /* (non-Javadoc)
@@ -76,6 +81,8 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
             calculateClientGenerators(warnings, progressCallback);
             
         calculateXmlMapperGenerator(javaClientGenerator, warnings, progressCallback);
+        
+        calculateServiceGenerators(warnings, progressCallback);
     }
 
     /**
@@ -155,6 +162,39 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
             javaGenerator = (AbstractJavaClientGenerator) ObjectFactory
                     .createInternalObject(type);
         }
+        
+        return javaGenerator;
+    }
+    
+    /**
+     *  generate 
+     * @param warnings
+     * @param progressCallback
+     * @return
+     */
+    protected AbstractJavaClientGenerator calculateServiceGenerators(List<String> warnings,
+            ProgressCallback progressCallback) {
+        if (!rules.generateJavaClient()) {
+            return null;
+        }
+        
+        AbstractJavaClientGenerator javaGenerator = createJavaServiceGenerator();
+        if (javaGenerator == null) {
+            return null;
+        }
+
+        initializeAbstractGenerator(javaGenerator, warnings, progressCallback);
+        serviceGenerators.add(javaGenerator);
+        
+        return javaGenerator;
+    }
+    
+    protected AbstractJavaClientGenerator createJavaServiceGenerator() {
+        if (context.getJavaServiceGeneratorConfiguration() == null) {
+            return null;
+        }
+
+        AbstractJavaClientGenerator javaGenerator = new SimpleJavaServiceGenerator();
         
         return javaGenerator;
     }
@@ -253,6 +293,19 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
                 answer.add(gjf);
             }
         }
+        
+        for (AbstractJavaGenerator javaGenerator : serviceGenerators) {
+            List<CompilationUnit> compilationUnits = javaGenerator
+                    .getCompilationUnits();
+            for (CompilationUnit compilationUnit : compilationUnits) {
+                GeneratedJavaFile gjf = new GeneratedJavaFile(compilationUnit,
+                        context.getJavaServiceGeneratorConfiguration()
+                                .getTargetProject(),
+                                context.getProperty(PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING),
+                                context.getJavaFormatter());
+                answer.add(gjf);
+            }
+        }
 
         return answer;
     }
@@ -283,7 +336,7 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
      */
     @Override
     public int getGenerationSteps() {
-        return javaModelGenerators.size() + clientGenerators.size() +
+        return javaModelGenerators.size() + clientGenerators.size() + serviceGenerators.size() +
             (xmlMapperGenerator == null ? 0 : 1);
     }
 
