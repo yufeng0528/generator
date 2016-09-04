@@ -29,6 +29,7 @@ import org.mybatis.generator.api.dom.xml.XmlElement;
 public class JavaServiceGeneratorConfiguration extends TypedPropertyHolder {
     private String targetPackage;
     private String targetProject;
+    private Boolean genTest;
 
     /**
      *  
@@ -63,6 +64,10 @@ public class JavaServiceGeneratorConfiguration extends TypedPropertyHolder {
         if (targetProject != null) {
             answer.addAttribute(new Attribute("targetProject", targetProject)); //$NON-NLS-1$
         }
+        
+        if (genTest != null) {
+            answer.addAttribute(new Attribute("genTest", genTest ? "true" : "false")); //$NON-NLS-1$
+        }
 
         addPropertyXmlElements(answer);
 
@@ -80,4 +85,12 @@ public class JavaServiceGeneratorConfiguration extends TypedPropertyHolder {
         }
         
     }
+
+	public Boolean getGenTest() {
+		return genTest;
+	}
+
+	public void setGenTest(Boolean genTest) {
+		this.genTest = genTest;
+	}
 }

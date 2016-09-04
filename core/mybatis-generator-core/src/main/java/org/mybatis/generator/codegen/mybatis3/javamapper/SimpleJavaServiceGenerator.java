@@ -61,7 +61,7 @@ public class SimpleJavaServiceGenerator extends AbstractJavaClientGenerator {
     public List<CompilationUnit> getCompilationUnits() {
     	Set<FullyQualifiedJavaType> importedTypes = new TreeSet<FullyQualifiedJavaType>();
     	
-        progressCallback.startTask(getString("Progress.17", //$NON-NLS-1$
+        progressCallback.startTask(getString("Progress.19", //$NON-NLS-1$
                 introspectedTable.getFullyQualifiedTable().toString()));
         CommentGenerator commentGenerator = context.getCommentGenerator();
 

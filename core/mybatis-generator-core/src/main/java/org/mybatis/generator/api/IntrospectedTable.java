@@ -179,6 +179,9 @@ public abstract class IntrospectedTable {
         
         /**The ATT service fileName */
         ATTR_MYBATIS3_JAVA_SERVICE_TYPE,
+        
+        /**The ATT service test fileName */
+        ATTR_MYBATIS3_JAVA_SERVICE_TEST_TYPE,
     }
 
     /** The table configuration. */
@@ -1386,6 +1389,9 @@ public abstract class IntrospectedTable {
             sb.append("Service"); //$NON-NLS-1$
         }
         setMyBatis3JavaServiceType(sb.toString());
+        
+        sb.append("Test"); 
+        setMyBatis3JavaServiceTestType(sb.toString());
     }
 
     /**
@@ -1875,6 +1881,24 @@ public abstract class IntrospectedTable {
     	internalAttributes.put(
                 InternalAttribute.ATTR_MYBATIS3_JAVA_SERVICE_TYPE,
                 myBatis3JavaServiceType);
+    }
+    
+    /**
+     * Gets the mybatis3 Serivce test Type
+     * @return
+     */
+    public String getMyBatis3JavaServiceTestType(){
+    	return internalAttributes.get(InternalAttribute.ATTR_MYBATIS3_JAVA_SERVICE_TEST_TYPE);
+    }
+    
+    /**
+     * Sets the mybatis3 Serivce test Type
+     * @param myBatis3JavaServiceTestType
+     */
+    public void setMyBatis3JavaServiceTestType(String myBatis3JavaServiceTestType){
+    	internalAttributes.put(
+                InternalAttribute.ATTR_MYBATIS3_JAVA_SERVICE_TEST_TYPE,
+                myBatis3JavaServiceTestType);
     }
     
     /**
