@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.mybatis.generator.api.CommentGenerator;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.java.CompilationUnit;
 import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
@@ -36,6 +37,8 @@ import org.mybatis.generator.codegen.AbstractXmlGenerator;
 import org.mybatis.generator.codegen.mybatis3.xmlmapper.SimpleXMLMapperGenerator;
 
 public class SimpleJavaServiceGenerator extends AbstractJavaClientGenerator {
+	
+	private FullyQualifiedJavaType mapperType;
 
 	public SimpleJavaServiceGenerator() {
         super(true);
@@ -46,7 +49,7 @@ public class SimpleJavaServiceGenerator extends AbstractJavaClientGenerator {
     }
     
     private String getMapperName(){
-    	String myBatis3JavaMapperType = introspectedTable.getMyBatis3JavaMapperType();
+    	String myBatis3JavaMapperType = mapperType.getFullyQualifiedName();
     	if(myBatis3JavaMapperType.indexOf(".") == -1)
     		return myBatis3JavaMapperType;
     	int start = myBatis3JavaMapperType.lastIndexOf(".") + 1;
@@ -70,18 +73,22 @@ public class SimpleJavaServiceGenerator extends AbstractJavaClientGenerator {
         topLevelClass.addAnnotation("@Service");
         commentGenerator.addJavaFileComment(topLevelClass);
         
+        mapperType = new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType());
         importedTypes.add(new FullyQualifiedJavaType("org.springframework.beans.factory.annotation.Autowired"));
-        importedTypes.add(new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
+        importedTypes.add(mapperType);
         Field field = new Field();
         field.setVisibility(JavaVisibility.PRIVATE);
-        field.setType(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+        field.setType(mapperType);
         field.setName(getMapperName()); //$NON-NLS-1$
         field.addAnnotation("@Autowired");
         commentGenerator.addFieldComment(field, introspectedTable);
         topLevelClass.addField(field);
         
-        importedTypes.add(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
-        addSelectByPrimaryKeyMethod(topLevelClass);
+        
+        addSelectByPrimaryKeyMethod(topLevelClass, importedTypes);
+        addInsertMethood(topLevelClass, importedTypes);
+        addUpdateByPrimaryKeyMethod(topLevelClass, importedTypes);
+        addDeleteByPrimaryKeyMethod(topLevelClass, importedTypes);
         
         topLevelClass.addImportedTypes(importedTypes);
 
@@ -94,14 +101,80 @@ public class SimpleJavaServiceGenerator extends AbstractJavaClientGenerator {
         return answer;
     }
     
-    protected void addSelectByPrimaryKeyMethod(TopLevelClass topLevelClass) {
+    protected void addSelectByPrimaryKeyMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+        	importedTypes.add(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+        	
+            Method method = new Method();
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("getById"); //$NON-NLS-1$
+            method.setReturnType(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+            List<IntrospectedColumn> introspectedColumns = introspectedTable
+                    .getPrimaryKeyColumns();
+            StringBuilder sb = new StringBuilder();
+            for (IntrospectedColumn introspectedColumn : introspectedColumns) {
+                FullyQualifiedJavaType type = introspectedColumn
+                        .getFullyQualifiedJavaType();
+                importedTypes.add(type);
+                Parameter parameter = new Parameter(type, introspectedColumn
+                        .getJavaProperty());
+                method.addParameter(parameter);
+                sb.append(",").append(parameter.getName());
+            }
+            sb.deleteCharAt(0);
+            method.addBodyLine("return " + getMapperName() + ".selectByPrimary(" + sb.toString() + ");"); //$NON-NLS-1$
+            topLevelClass.addMethod(method);
+        }
+    }
+    
+    protected void addInsertMethood(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
         if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
             Method method = new Method();
             method.setVisibility(JavaVisibility.PUBLIC);
-            method.setName("selectById"); //$NON-NLS-1$
-            method.setReturnType(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
-            method.addParameter(new Parameter(PrimitiveTypeWrapper.getLongInstance(), "id"));
-            method.addBodyLine("return " + getMapperName() + ".selectByPrimary(id);"); //$NON-NLS-1$
+            method.setName("add"); //$NON-NLS-1$
+            method.setReturnType(PrimitiveTypeWrapper.getStringInstance());
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), "record"));
+            method.addBodyLine(getMapperName() + ".insert(record);"); 
+            method.addBodyLine("return null;"); //$NON-NLS-1$
+            topLevelClass.addMethod(method);
+        }
+    }
+    
+    protected void addUpdateByPrimaryKeyMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+            Method method = new Method();
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("update"); //$NON-NLS-1$
+            method.setReturnType(PrimitiveTypeWrapper.getStringInstance());
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), "record"));
+            method.addBodyLine(getMapperName() + ".updateByPrimaryKey(record);");
+            method.addBodyLine("return null;"); //$NON-NLS-1$
+            topLevelClass.addMethod(method);
+        }
+    }
+    
+    protected void addDeleteByPrimaryKeyMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+            Method method = new Method();
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("deleteById"); //$NON-NLS-1$
+            method.setReturnType(PrimitiveTypeWrapper.getStringInstance());
+            
+            List<IntrospectedColumn> introspectedColumns = introspectedTable
+                    .getPrimaryKeyColumns();
+            StringBuilder sb = new StringBuilder();
+            for (IntrospectedColumn introspectedColumn : introspectedColumns) {
+                FullyQualifiedJavaType type = introspectedColumn
+                        .getFullyQualifiedJavaType();
+                importedTypes.add(type);
+                Parameter parameter = new Parameter(type, introspectedColumn
+                        .getJavaProperty());
+                method.addParameter(parameter);
+                sb.append(",").append(parameter.getName());
+            }
+            sb.deleteCharAt(0);
+            method.addBodyLine(getMapperName() + ".deleteByPrimaryKey(" + sb.toString() + ");");
+            method.addBodyLine("return null;"); //$NON-NLS-1$
             topLevelClass.addMethod(method);
         }
     }
