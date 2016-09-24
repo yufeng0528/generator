@@ -122,7 +122,7 @@ public class SimpleJavaServiceGenerator extends AbstractJavaClientGenerator {
                 sb.append(",").append(parameter.getName());
             }
             sb.deleteCharAt(0);
-            method.addBodyLine("return " + getMapperName() + ".selectByPrimary(" + sb.toString() + ");"); //$NON-NLS-1$
+            method.addBodyLine("return " + getMapperName() + ".selectByPrimaryKey(" + sb.toString() + ");"); //$NON-NLS-1$
             topLevelClass.addMethod(method);
         }
     }

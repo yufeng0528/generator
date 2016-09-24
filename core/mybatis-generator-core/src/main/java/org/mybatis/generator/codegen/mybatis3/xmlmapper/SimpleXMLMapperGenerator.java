@@ -57,7 +57,6 @@ public class SimpleXMLMapperGenerator extends AbstractXmlGenerator {
         addInsertElement(answer);
         addUpdateByPrimaryKeyElement(answer);
         addSelectByPrimaryKeyElement(answer);
-        addSelectAllElement(answer);
 
         return answer;
     }

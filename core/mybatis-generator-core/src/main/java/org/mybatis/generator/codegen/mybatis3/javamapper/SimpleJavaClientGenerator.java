@@ -83,7 +83,6 @@ public class SimpleJavaClientGenerator extends AbstractJavaClientGenerator {
         addDeleteByPrimaryKeyMethod(interfaze);
         addInsertMethod(interfaze);
         addSelectByPrimaryKeyMethod(interfaze);
-        addSelectAllMethod(interfaze);
         addUpdateByPrimaryKeyMethod(interfaze);
 
         List<CompilationUnit> answer = new ArrayList<CompilationUnit>();

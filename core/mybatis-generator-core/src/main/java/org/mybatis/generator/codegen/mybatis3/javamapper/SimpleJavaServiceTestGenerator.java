@@ -30,7 +30,6 @@ import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
 import org.mybatis.generator.api.dom.java.Method;
-import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.codegen.AbstractJavaClientGenerator;
 import org.mybatis.generator.codegen.AbstractXmlGenerator;
@@ -76,12 +75,14 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
         FullyQualifiedJavaType type = new FullyQualifiedJavaType(
                 introspectedTable.getMyBatis3JavaServiceTestType());
         TopLevelClass topLevelClass = new TopLevelClass(type);
+        topLevelClass.setSuperClass(new FullyQualifiedJavaType("yike.AbstractTestCase"));
         topLevelClass.setVisibility(JavaVisibility.PUBLIC);
         commentGenerator.addJavaFileComment(topLevelClass);
         
         serviceType = new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaServiceType());
         importedTypes.add(new FullyQualifiedJavaType("org.springframework.beans.factory.annotation.Autowired"));
         importedTypes.add(serviceType);
+        importedTypes.add(topLevelClass.getSuperClass());
         Field field = new Field();
         field.setVisibility(JavaVisibility.PRIVATE);
         field.setType(serviceType);
@@ -93,8 +94,9 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
         
         importedTypes.add(new FullyQualifiedJavaType("org.junit.Test"));
         addGenModelMethod(topLevelClass, importedTypes);
-        addInsertMethood(topLevelClass, importedTypes);
-        addUpdateByPrimaryKeyMethod(topLevelClass, importedTypes);
+        addTestAddMethood(topLevelClass, importedTypes);
+        addTestUpdateMethod(topLevelClass, importedTypes);
+        addDeleteMethod(topLevelClass, importedTypes);
         
         topLevelClass.addImportedTypes(importedTypes);
 
@@ -114,6 +116,7 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
         
         FullyQualifiedJavaType type = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
         importedTypes.add(type);
+        method.setReturnType(type);
         
         method.addBodyLine(getDomainName() + " record = new " + getDomainName() + "();");
         method.addBodyLine("//TODO:");
@@ -162,7 +165,7 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
     	
     }
     
-    protected void addInsertMethood(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+    protected void addTestAddMethood(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
         if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
             Method method = new Method();
             method.addAnnotation("@Test");
@@ -172,12 +175,12 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
             FullyQualifiedJavaType type = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
             importedTypes.add(type);
             method.addBodyLine(getDomainName() + " record = genRecord();");
-            method.addBodyLine(getServiceName() + ".insert(record);");
+            method.addBodyLine(getServiceName() + ".add(record);");
             
             method.addBodyLine("");
             
             method.addBodyLine(getDomainName() + " recordInDb = " + 
-            		getServiceName() + ".getById(record." + getGetterMethodName(importedTypes) + ")");
+            		getServiceName() + ".getById(record." + getGetterMethodName(importedTypes) + ");");
             
             //add assert 
             getAssertMethod(method, importedTypes);
@@ -186,17 +189,40 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
         }
     }
     
-    protected void addUpdateByPrimaryKeyMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+    protected void addTestUpdateMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
         if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
             Method method = new Method();
             method.addAnnotation("@Test");
             method.setVisibility(JavaVisibility.PUBLIC);
-            method.setName("update"); //$NON-NLS-1$
+            method.setName("testUpdate"); //$NON-NLS-1$
             
             FullyQualifiedJavaType type = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
             importedTypes.add(type);
-            method.addParameter(new Parameter(type, "record"));
-            method.addBodyLine(getServiceName() + ".updateByPrimaryKey(record);");
+//            method.addBodyLine(getServiceName() + ".update(record);");
+            topLevelClass.addMethod(method);
+        }
+    }
+    
+    protected void addDeleteMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+            Method method = new Method();
+            method.addAnnotation("@Test");
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("testDelete"); //$NON-NLS-1$
+            
+            FullyQualifiedJavaType type = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
+            importedTypes.add(type);
+            method.addBodyLine(getDomainName() + " record = genRecord();");
+            method.addBodyLine(getServiceName() + ".add(record);");
+            
+            method.addBodyLine("");
+            
+            method.addBodyLine(getServiceName() + ".deleteById(record." + getGetterMethodName(importedTypes) + ");");
+            method.addBodyLine(getDomainName() + " nullRecord = " + 
+            		getServiceName() + ".getById(record." + getGetterMethodName(importedTypes) + ");");
+            //add assert 
+            method.addBodyLine("assertNull(nullRecord);");
+            
             topLevelClass.addMethod(method);
         }
     }
