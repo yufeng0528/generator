@@ -76,7 +76,7 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
         FullyQualifiedJavaType type = new FullyQualifiedJavaType(
                 introspectedTable.getMyBatis3JavaServiceTestType());
         TopLevelClass topLevelClass = new TopLevelClass(type);
-        topLevelClass.setSuperClass(new FullyQualifiedJavaType("yike.AbstractTestCase"));
+        topLevelClass.setSuperClass(new FullyQualifiedJavaType(context.getJavaServiceGeneratorConfiguration().getBaseTestClass()));
         topLevelClass.setVisibility(JavaVisibility.PUBLIC);
         commentGenerator.addJavaFileComment(topLevelClass);
         

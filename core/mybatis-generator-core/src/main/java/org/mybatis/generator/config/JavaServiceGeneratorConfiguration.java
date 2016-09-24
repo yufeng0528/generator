@@ -30,6 +30,7 @@ public class JavaServiceGeneratorConfiguration extends TypedPropertyHolder {
     private String targetPackage;
     private String targetProject;
     private Boolean genTest;
+    private String baseTestClass;
 
     /**
      *  
@@ -68,6 +69,10 @@ public class JavaServiceGeneratorConfiguration extends TypedPropertyHolder {
         if (genTest != null) {
             answer.addAttribute(new Attribute("genTest", genTest ? "true" : "false")); //$NON-NLS-1$
         }
+        
+        if (baseTestClass != null) {
+			answer.addAttribute(new Attribute("baseTestClass", baseTestClass));
+		}
 
         addPropertyXmlElements(answer);
 
@@ -92,5 +97,13 @@ public class JavaServiceGeneratorConfiguration extends TypedPropertyHolder {
 
 	public void setGenTest(Boolean genTest) {
 		this.genTest = genTest;
+	}
+
+	public String getBaseTestClass() {
+		return baseTestClass;
+	}
+
+	public void setBaseTestClass(String baseTestClass) {
+		this.baseTestClass = baseTestClass;
 	}
 }

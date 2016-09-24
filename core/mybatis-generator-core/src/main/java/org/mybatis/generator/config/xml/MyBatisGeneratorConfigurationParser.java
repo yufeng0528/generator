@@ -643,6 +643,7 @@ public class MyBatisGeneratorConfigurationParser {
         String targetPackage = attributes.getProperty("targetPackage"); //$NON-NLS-1$
         String targetProject = attributes.getProperty("targetProject"); //$NON-NLS-1$
         String genTest = attributes.getProperty("genTest");
+        String baseTestClass = attributes.getProperty("baseTestClass");
 
         javaServiceGeneratorConfiguration.setTargetPackage(targetPackage);
         javaServiceGeneratorConfiguration.setTargetProject(targetProject);
@@ -650,6 +651,9 @@ public class MyBatisGeneratorConfigurationParser {
 			javaServiceGeneratorConfiguration.setGenTest(true);
 		}else {
 			javaServiceGeneratorConfiguration.setGenTest(false);
+		}
+        if (baseTestClass != null) {
+			javaServiceGeneratorConfiguration.setBaseTestClass(baseTestClass);
 		}
 
         NodeList nodeList = node.getChildNodes();

@@ -40,7 +40,7 @@
         <javaClientGenerator type="XMLMAPPER" targetPackage="com.trymore.pifa.mapper" targetProject="src">  
             <property name="enableSubPackages" value="false"/>  
         </javaClientGenerator> 
-        <javaServiceGenerator targetPackage="com.trymore.pifa.service" genTest="true" targetProject="/Users/fengyu/Downloads/java/jar/com">  
+        <javaServiceGenerator targetPackage="com.trymore.pifa.service" genTest="true" baseTestClass="yike.AbstractTestCase" targetProject="/Users/fengyu/Downloads/java/jar/com">  
             <property name="enableSubPackages" value="false"/>  
         </javaServiceGenerator> 
 

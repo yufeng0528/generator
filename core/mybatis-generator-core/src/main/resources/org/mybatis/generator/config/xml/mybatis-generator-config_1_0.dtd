@@ -157,7 +157,9 @@
   targetPackage CDATA #REQUIRED
   targetProject CDATA #REQUIRED
   implementationPackage CDATA #IMPLIED
-  genTest CDATA #IMPLIED>
+  genTest CDATA #IMPLIED
+  baseTestClass CDATA #IMPLIED
+>
 
 <!--
   The table element is used to specify a database table that will be the source information
