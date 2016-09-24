@@ -30,6 +30,7 @@ import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
 import org.mybatis.generator.api.dom.java.Method;
+import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.codegen.AbstractJavaClientGenerator;
 import org.mybatis.generator.codegen.AbstractXmlGenerator;
@@ -94,6 +95,7 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
         
         importedTypes.add(new FullyQualifiedJavaType("org.junit.Test"));
         addGenModelMethod(topLevelClass, importedTypes);
+        addModifyModelMethod(topLevelClass, importedTypes);
         addTestAddMethood(topLevelClass, importedTypes);
         addTestUpdateMethod(topLevelClass, importedTypes);
         addDeleteMethod(topLevelClass, importedTypes);
@@ -120,8 +122,27 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
         
         method.addBodyLine(getDomainName() + " record = new " + getDomainName() + "();");
         method.addBodyLine("//TODO:");
-        method.addBodyLine("return record;"); 
+        method.addBodyLine("throw new NotImplementedException();"); 
         topLevelClass.addMethod(method);
+        
+        importedTypes.add(new FullyQualifiedJavaType("org.apache.commons.lang.NotImplementedException"));
+    }
+    
+    protected void addModifyModelMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+    	Method method = new Method();
+        method.setVisibility(JavaVisibility.PRIVATE);
+        method.setName("modifyRecord"); //$NON-NLS-1$
+        
+        FullyQualifiedJavaType type = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
+        importedTypes.add(type);
+        method.setReturnType(type);
+        method.addParameter(new Parameter(type, "record"));
+        
+        method.addBodyLine("//TODO:");
+        method.addBodyLine("throw new NotImplementedException();"); 
+        topLevelClass.addMethod(method);
+        
+        importedTypes.add(new FullyQualifiedJavaType("org.apache.commons.lang.NotImplementedException"));
     }
     
     private String getGetterMethodName(Set<FullyQualifiedJavaType> importedTypes){
@@ -149,18 +170,20 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
     	List<IntrospectedColumn> introspectedColumns = introspectedTable
                 .getAllColumns();
     	for (IntrospectedColumn introspectedColumn : introspectedColumns) {
-            FullyQualifiedJavaType type = introspectedColumn
-                    .getFullyQualifiedJavaType();
-            importedTypes.add(type);
-            
-            sb.setLength(0);
-            sb.append("assertEquals(record.");
-            sb.append(getJavaBeansGetter(introspectedColumn, context, introspectedTable).getName());
-            sb.append("(), ");
-            sb.append("recordInDb.");
-            sb.append(getJavaBeansGetter(introspectedColumn, context, introspectedTable).getName());
-            sb.append("());");
-            method.addBodyLine(sb.toString());
+    		if (!introspectedColumn.getFullyQualifiedJavaType().getFullyQualifiedName().equals("java.util.Date")) {
+    			FullyQualifiedJavaType type = introspectedColumn
+                        .getFullyQualifiedJavaType();
+                importedTypes.add(type);
+                
+                sb.setLength(0);
+                sb.append("assertEquals(record.");
+                sb.append(getJavaBeansGetter(introspectedColumn, context, introspectedTable).getName());
+                sb.append("(), ");
+                sb.append("recordInDb.");
+                sb.append(getJavaBeansGetter(introspectedColumn, context, introspectedTable).getName());
+                sb.append("());");
+                method.addBodyLine(sb.toString());
+			}
         }
     	
     }
@@ -198,7 +221,20 @@ public class SimpleJavaServiceTestGenerator extends AbstractJavaClientGenerator 
             
             FullyQualifiedJavaType type = new FullyQualifiedJavaType(introspectedTable.getBaseRecordType());
             importedTypes.add(type);
-//            method.addBodyLine(getServiceName() + ".update(record);");
+            method.addBodyLine(getDomainName() + " record = genRecord();");
+            method.addBodyLine(getServiceName() + ".add(record);");
+            
+            method.addBodyLine("");
+            method.addBodyLine("modifyRecord(record);");
+            method.addBodyLine(getServiceName() + ".update(record);");
+            method.addBodyLine("");
+            
+            method.addBodyLine(getDomainName() + " recordInDb = " + 
+            		getServiceName() + ".getById(record." + getGetterMethodName(importedTypes) + ");");
+            
+            //add assert 
+            getAssertMethod(method, importedTypes);
+            
             topLevelClass.addMethod(method);
         }
     }
