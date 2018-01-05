@@ -64,7 +64,8 @@ public class SqlScriptRunner {
         try {
             Class.forName(driver);
             connection = DriverManager.getConnection(url, userid, password);
-
+            connection.setAutoCommit(false);
+            
             Statement statement = connection.createStatement();
 
             BufferedReader br = new BufferedReader(new InputStreamReader(sourceFile));
