@@ -5,43 +5,44 @@
 
 <generatorConfiguration>
   <classPathEntry location="D:/.m2/repository/mysql/mysql-connector-java/5.1.17/mysql-connector-java-5.1.17.jar" />
-
+  
   <context id="DB2Tables" targetRuntime="MyBatis3">
 
-  <property name="javaFileEncoding" value="UTF-8"/> 
-
-  <commentGenerator>
-    <property name="suppressDate" value="true"/>
-    <property name="suppressAllComments" value="false"/>
-    <property name="addRemarkComments" value="true"/>
-  </commentGenerator>
-
-    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-        connectionURL="jdbc:mysql://127.0.0.1:3306/market?useUnicode=true"
-        userId="root"
-        password="yiguokeji01db">
-    </jdbcConnection>
-
-    <javaTypeResolver >
-      <property name="forceBigDecimals" value="true" />
-    </javaTypeResolver>
-
-    <javaModelGenerator targetPackage="yike.obj" targetProject="MAVEN">
-      <property name="enableSubPackages" value="true" />
-      <property name="trimStrings" value="false" />
-    </javaModelGenerator>
-
-    <sqlMapGenerator targetPackage="yike.dao"  targetProject="MAVEN">
-      <property name="enableSubPackages" value="true" />
-    </sqlMapGenerator>
+	  <property name="javaFileEncoding" value="UTF-8"/> 
 	
-	<javaClientGenerator type="XMLMAPPER" targetPackage="yike.dao" targetProject="MAVEN">  
-	  <property name="enableSubPackages" value="true" />
-	</javaClientGenerator>  
+	  <commentGenerator type="org.mybatis.generator.plugins.DefaultCommentGenerator">
+	    <property name="suppressDate" value="true"/>
+	    <property name="suppressAllComments" value="false"/>
+	    <property name="addRemarkComments" value="true"/>
+	  </commentGenerator>
 	
-    <table tableName="promotion_info" domainObjectName="PromotionInfo" enableCountByExample="true" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true" selectByExampleQueryId="true">
-      <generatedKey column="id" sqlStatement="JDBC"/>
-    </table>
+	    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+	        connectionURL="jdbc:mysql://127.0.0.1:3306/market?useUnicode=true"
+	        userId="root"
+	        password="yiguokeji01db">
+	        <property name="useInformationSchema"  value="true"/>
+	    </jdbcConnection>
+	
+	    <javaTypeResolver >
+	      <property name="forceBigDecimals" value="true" />
+	    </javaTypeResolver>
+	
+	    <javaModelGenerator targetPackage="yike.obj" targetProject="MAVEN">
+	      <property name="enableSubPackages" value="true" />
+	      <property name="trimStrings" value="false" />
+	    </javaModelGenerator>
+	
+	    <sqlMapGenerator targetPackage="yike.dao"  targetProject="MAVEN">
+	      <property name="enableSubPackages" value="true" />
+	    </sqlMapGenerator>
+		
+		<javaClientGenerator type="XMLMAPPER" targetPackage="yike.dao" targetProject="MAVEN">  
+		  <property name="enableSubPackages" value="true" />
+		</javaClientGenerator>  
+		
+	    <table tableName="promotion_info" domainObjectName="PromotionInfo" enableCountByExample="true" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true" selectByExampleQueryId="true">
+	      <generatedKey column="id" sqlStatement="JDBC"/>
+	    </table>
 
    
   </context>
