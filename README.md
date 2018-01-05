@@ -1,14 +1,55 @@
-MyBatis Generator (MBG)
-=======================
+##我自己的xml配置
+分支release_1.3.6.1
+###MySQLPaginationPlugin
+分页配置
+###RenameExampleClassPlugin
+把Example命名为Criteria
+<code>
 
-[![Build Status](https://travis-ci.org/mybatis/generator.svg?branch=master)](https://travis-ci.org/mybatis/generator)
-[![Coverage Status](https://coveralls.io/repos/mybatis/generator/badge.svg?branch=master&service=github)](https://coveralls.io/github/mybatis/generator?branch=master)
-[![Dependency Status](https://www.versioneye.com/user/projects/561964c6a193340f2800033c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/561964c6a193340f2800033c)
-[![Maven central](https://maven-badges.herokuapp.com/maven-central/org.mybatis.generator/mybatis-generator/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.mybatis.generator/mybatis-generator)
-[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-
-![mybatis-generator](http://mybatis.github.io/images/mybatis-logo.png)
-
-Code generator for MyBatis and iBATIS.
-
-It will generate code for all versions of MyBatis, and versions of iBATIS after version 2.2.0. It will introspect a database table (or many tables) and will generate artifacts that can be used to access the table(s). This lessens the initial nuisance of setting up objects and configuration files to interact with database tables. MBG seeks to make a major impact on the large percentage of database operations that are simple CRUD (Create, Retrieve, Update, Delete).
+	<generatorConfiguration>
+		  <classPathEntry location="jar包的路径/mysql-connector-java-5.1.17.jar" />
+		  <context id="DB2Tables" targetRuntime="MyBatis3">
+			  <plugin type="org.mybatis.generator.plugins.MySQLPaginationPlugin" />
+			  <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin" >
+			      <property name="searchString" value="Example$"/>
+			      <property name="replaceString" value="Criteria"/>
+			    </plugin>
+			  <commentGenerator type="org.mybatis.generator.plugins.DefaultCommentGenerator">
+			    <property name="suppressDate" value="true"/>
+			    <property name="suppressAllComments" value="false"/>
+			    <property name="addRemarkComments" value="true"/>
+			  </commentGenerator>
+			
+			    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			        connectionURL="jdbc:mysql://127.0.0.1:3306/market?useUnicode=true"
+			        userId="root"
+			        password="yiguokeji01db">
+			        <property name="useInformationSchema"  value="true"/>
+			    </jdbcConnection>
+			
+			    <javaTypeResolver >
+			      <property name="forceBigDecimals" value="true" />
+			    </javaTypeResolver>
+			
+			    <javaModelGenerator targetPackage="yike.obj" targetProject="自己的文件目录">
+			      <property name="enableSubPackages" value="true" />
+			      <property name="trimStrings" value="false" />
+			    </javaModelGenerator>
+			
+			    <sqlMapGenerator targetPackage="yike.dao"  targetProject="自己的文件目录">
+			      <property name="enableSubPackages" value="true" />
+			    </sqlMapGenerator>
+				
+				<javaClientGenerator type="XMLMAPPER" targetPackage="yike.dao" targetProject="自己的文件目录">  
+				  <property name="enableSubPackages" value="true" />
+				</javaClientGenerator>  
+				
+			    <table tableName="promotion_info" domainObjectName="PromotionInfo" enableCountByExample="true" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true" selectByExampleQueryId="true">
+			      <generatedKey column="id" sqlStatement="JDBC"/>
+			    </table>
+		
+		   
+		  </context>
+	  
+	</generatorConfiguration>
+</code>

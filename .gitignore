@@ -55,3 +55,6 @@ eclipse/org.mybatis.generator.eclipse.parent/.settings/
 eclipse/org.mybatis.generator.core/.settings/
 eclipse/org.mybatis.generator.eclipse.doc/
 eclipse/org.mybatis.generator.eclipse.core/.settings/
+core/mybatis-generator-systests-mybatis3-java8/.project
+core/mybatis-generator-systests-mybatis3-java8/.settings/org.eclipse.core.resources.prefs
+core/mybatis-generator-systests-mybatis3-java8/.settings/org.eclipse.m2e.core.prefs
