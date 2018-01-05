@@ -48,3 +48,10 @@
 /core/mybatis-generator-systests-domtests/.settings
 /core/mybatis-generator-systests-domtests/target
 /.project
+eclipse/org.mybatis.generator/.settings/
+eclipse/org.mybatis.generator.eclipse.ui/.settings/
+eclipse/org.mybatis.generator.eclipse.site/.settings/
+eclipse/org.mybatis.generator.eclipse.parent/.settings/
+eclipse/org.mybatis.generator.core/.settings/
+eclipse/org.mybatis.generator.eclipse.doc/
+eclipse/org.mybatis.generator.eclipse.core/.settings/
