@@ -1,9 +1,15 @@
 ##我自己的xml配置
+
 分支release_1.3.6.1
+
 ###MySQLPaginationPlugin
+
 分页配置
+
 ###RenameExampleClassPlugin
+
 把Example命名为Criteria
+
 <code>
 
 	<generatorConfiguration>
