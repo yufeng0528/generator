@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,14 +23,13 @@ import org.mybatis.generator.internal.DefaultShellCallback;
 import org.mybatis.generator.internal.util.messages.Messages;
 
 /**
+ * Shell callback that calculates the Maven output directory.
+ * 
  * @author Jeff Butler
  */
 public class MavenShellCallback extends DefaultShellCallback {
     private MyBatisGeneratorMojo mybatisGeneratorMojo;
 
-    /**
-     * @param overwrite
-     */
     public MavenShellCallback(MyBatisGeneratorMojo mybatisGeneratorMojo, boolean overwrite) {
         super(overwrite);
         this.mybatisGeneratorMojo = mybatisGeneratorMojo;

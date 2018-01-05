@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,9 +35,10 @@ public class ToStringPlugin extends PluginAdapter {
     @Override
     public void setProperties(Properties properties) {
         super.setProperties(properties);
-        useToStringFromRoot = isTrue(properties.getProperty("useToStringFromRoot"));
+        useToStringFromRoot = isTrue(properties.getProperty("useToStringFromRoot")); //$NON-NLS-1$
     }
 
+    @Override
     public boolean validate(List<String> warnings) {
         return true;
     }
@@ -55,7 +56,7 @@ public class ToStringPlugin extends PluginAdapter {
         generateToString(introspectedTable, topLevelClass);
         return true;
     }
-    
+
     @Override
     public boolean modelPrimaryKeyClassGenerated(TopLevelClass topLevelClass,
             IntrospectedTable introspectedTable) {

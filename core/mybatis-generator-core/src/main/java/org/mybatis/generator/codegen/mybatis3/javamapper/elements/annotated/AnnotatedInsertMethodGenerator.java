@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,23 +36,19 @@ import org.mybatis.generator.config.GeneratedKey;
  * 
  * @author Jeff Butler
  */
-public class AnnotatedInsertMethodGenerator extends
-    InsertMethodGenerator {
+public class AnnotatedInsertMethodGenerator extends InsertMethodGenerator {
 
     public AnnotatedInsertMethodGenerator(boolean isSimple) {
         super(isSimple);
     }
 
     @Override
-    public void addMapperAnnotations(Interface interfaze, Method method) {
-        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.Insert")); //$NON-NLS-1$
-        
-        GeneratedKey gk = introspectedTable.getGeneratedKey();
-        
+    public void addMapperAnnotations(Method method) {
+
         method.addAnnotation("@Insert({"); //$NON-NLS-1$
         StringBuilder insertClause = new StringBuilder();
         StringBuilder valuesClause = new StringBuilder();
-        
+
         javaIndent(insertClause, 1);
         javaIndent(valuesClause, 1);
 
@@ -64,7 +60,8 @@ public class AnnotatedInsertMethodGenerator extends
         valuesClause.append("\"values ("); //$NON-NLS-1$
 
         List<String> valuesClauses = new ArrayList<String>();
-        Iterator<IntrospectedColumn> iter = ListUtilities.removeIdentityAndGeneratedAlwaysColumns(introspectedTable.getAllColumns())
+        Iterator<IntrospectedColumn> iter =
+                ListUtilities.removeIdentityAndGeneratedAlwaysColumns(introspectedTable.getAllColumns())
                 .iterator();
         boolean hasFields = false;
         while (iter.hasNext()) {
@@ -88,12 +85,12 @@ public class AnnotatedInsertMethodGenerator extends
                 if (iter.hasNext()) {
                     valuesClause.append(',');
                 }
-                
+
                 method.addAnnotation(insertClause.toString());
                 insertClause.setLength(0);
                 javaIndent(insertClause, 1);
                 insertClause.append('\"');
-                
+
                 valuesClauses.add(valuesClause.toString());
                 valuesClause.setLength(0);
                 javaIndent(valuesClause, 1);
@@ -101,7 +98,7 @@ public class AnnotatedInsertMethodGenerator extends
                 hasFields = false;
             }
         }
-        
+
         if (hasFields) {
             insertClause.append(")\","); //$NON-NLS-1$
             method.addAnnotation(insertClause.toString());
@@ -113,11 +110,21 @@ public class AnnotatedInsertMethodGenerator extends
         for (String clause : valuesClauses) {
             method.addAnnotation(clause);
         }
-        
+
         method.addAnnotation("})"); //$NON-NLS-1$
 
+        GeneratedKey gk = introspectedTable.getGeneratedKey();
         if (gk != null) {
-            addGeneratedKeyAnnotation(interfaze, method, gk);
+            addGeneratedKeyAnnotation(method, gk);
         }
+    }
+
+    @Override
+    public void addExtraImports(Interface interfaze) {
+        GeneratedKey gk = introspectedTable.getGeneratedKey();
+        if (gk != null) {
+            addGeneratedKeyImports(interfaze, gk);
+        }
+        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.Insert")); //$NON-NLS-1$
     }
 }

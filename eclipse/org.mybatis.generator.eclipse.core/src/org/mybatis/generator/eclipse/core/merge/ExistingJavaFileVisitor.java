@@ -26,12 +26,20 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.Javadoc;
+import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.NormalAnnotation;
+import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
+import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.mybatis.generator.api.MyBatisGenerator;
+import org.mybatis.generator.eclipse.core.merge.visitors.MethodSignatureStringifier;
 
 /**
  * @author Jeff Butler
@@ -82,8 +90,9 @@ public class ExistingJavaFileVisitor extends ASTVisitor {
         if (isGenerated(node)) {
             List<Annotation> annotations = retrieveAnnotations(node);
             if (!annotations.isEmpty()) {
-                String methodSignature = EclipseDomUtils
-                        .getMethodSignature(node);
+                MethodSignatureStringifier mss = new MethodSignatureStringifier();
+                node.accept(mss);
+                String methodSignature = mss.toString();
                 methodAnnotations.put(methodSignature, annotations);
             }
             node.delete();
@@ -124,8 +133,12 @@ public class ExistingJavaFileVisitor extends ASTVisitor {
         return typeDeclaration;
     }
 
-    @SuppressWarnings("unchecked")
     private boolean isGenerated(BodyDeclaration node) {
+        return hasGeneratedJavadoc(node) || hasGeneratedAnnotation(node);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private boolean hasGeneratedJavadoc(BodyDeclaration node) {
         boolean rc = false;
         Javadoc jd = node.getJavadoc();
         if (jd != null) {
@@ -155,6 +168,60 @@ public class ExistingJavaFileVisitor extends ASTVisitor {
 
         return rc;
     }
+    
+    @SuppressWarnings("unchecked")
+    private boolean hasGeneratedAnnotation(BodyDeclaration node) {
+        List<IExtendedModifier> modifiers = node.modifiers();
+        for (IExtendedModifier modifier : modifiers) {
+            if (modifier.isAnnotation()) {
+                if (isGeneratedAnnotation((Annotation) modifier)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private boolean isGeneratedAnnotation(Annotation annotation) {
+        String typeName = annotation.getTypeName().getFullyQualifiedName();
+        if (isGeneratedType(typeName)) {
+            if (annotation.isNormalAnnotation()) {
+                NormalAnnotation normalAnnotation = (NormalAnnotation) annotation;
+                List<MemberValuePair> values = normalAnnotation.values();
+                for (MemberValuePair pair : values) {
+                    String name = pair.getName().getFullyQualifiedName();
+                    String value = null;
+                    Expression exp = pair.getValue();
+                    if (exp instanceof StringLiteral) {
+                        value = ((StringLiteral) exp).getLiteralValue();
+                    }
+                    
+                    if (MyBatisGenerator.class.getName().equals(value)
+                            && "value".equals(name)) {
+                        return true;
+                    }
+                }
+            } else if (annotation.isSingleMemberAnnotation()) {
+                SingleMemberAnnotation singleMemberAnnotation = (SingleMemberAnnotation) annotation;
+                Expression exp = singleMemberAnnotation.getValue();
+                String value = null;
+                if (exp instanceof StringLiteral) {
+                    value = ((StringLiteral) exp).getLiteralValue();
+                }
+                if (MyBatisGenerator.class.getName().equals(value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    boolean isGeneratedType(String typeName) {
+        return "Generated".equals(typeName)
+                || "javax.annotation.Generated".equals(typeName);
+    }
 
     public boolean containsInnerClass(String name) {
         return generatedInnerClassesToKeep.contains(name);
@@ -180,6 +247,8 @@ public class ExistingJavaFileVisitor extends ASTVisitor {
 
     public List<Annotation> getMethodAnnotations(
             MethodDeclaration methodDeclaration) {
-        return methodAnnotations.get(EclipseDomUtils.getMethodSignature(methodDeclaration));
+        MethodSignatureStringifier mss = new MethodSignatureStringifier();
+        methodDeclaration.accept(mss);
+        return methodAnnotations.get(mss.toString());
     }
 }

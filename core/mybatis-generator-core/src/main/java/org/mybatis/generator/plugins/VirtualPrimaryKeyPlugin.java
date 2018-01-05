@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@ import org.mybatis.generator.api.PluginAdapter;
  * This plugin can be used to specify columns that act as a primary key, even if
  * they are not strictly defined as primary keys in the database.
  * 
- * To use the plugin, add a property to the table configuration specifying a
+ * <p>To use the plugin, add a property to the table configuration specifying a
  * comma delimited list of column names to use as a primary key:
  * 
- * <br><br>
- * &lt;property name="virtualKeyColumns" value="ID1,ID2"&gt;
+ * <p>&lt;property name="virtualKeyColumns" value="ID1,ID2"&gt;
  * 
  * @author Jeff Butler
  * 
@@ -39,6 +38,7 @@ public class VirtualPrimaryKeyPlugin extends PluginAdapter {
     /* (non-Javadoc)
      * @see org.mybatis.generator.api.Plugin#validate(java.util.List)
      */
+    @Override
     public boolean validate(List<String> warnings) {
         return true;
     }

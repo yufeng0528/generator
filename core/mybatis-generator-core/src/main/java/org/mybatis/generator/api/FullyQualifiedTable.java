@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,11 @@ import static org.mybatis.generator.internal.util.JavaBeansUtil.getCamelCaseStri
 import static org.mybatis.generator.internal.util.StringUtility.composeFullyQualifiedTableName;
 import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.mybatis.generator.config.Context;
+import org.mybatis.generator.config.DomainObjectRenamingRule;
 
 /**
  * The Class FullyQualifiedTable.
@@ -31,53 +35,34 @@ import org.mybatis.generator.config.Context;
  */
 public class FullyQualifiedTable {
 
-    /** The introspected catalog. */
     private String introspectedCatalog;
-
-    /** The introspected schema. */
     private String introspectedSchema;
-
-    /** The introspected table name. */
     private String introspectedTableName;
-
-    /** The runtime catalog. */
     private String runtimeCatalog;
-
-    /** The runtime schema. */
     private String runtimeSchema;
-
-    /** The runtime table name. */
     private String runtimeTableName;
-
-    /** The domain object name. */
     private String domainObjectName;
-    
-    /** The domain object sub package. */
     private String domainObjectSubPackage;
-
-    /** The alias. */
     private String alias;
-
-    /** The ignore qualifiers at runtime. */
     private boolean ignoreQualifiersAtRuntime;
-
-    /** The beginning delimiter. */
     private String beginningDelimiter;
-
-    /** The ending delimiter. */
     private String endingDelimiter;
+    private DomainObjectRenamingRule domainObjectRenamingRule;
 
     /**
-     * This object is used to hold information related to the table itself, not the columns in the table.
+     * This object is used to hold information related to the table itself, not the columns in the
+     * table.
      *
      * @param introspectedCatalog
-     *            the actual catalog of the table as returned from DatabaseMetaData. This value should only be set if
-     *            the user configured a catalog. Otherwise the DatabaseMetaData is reporting some database default that
-     *            we don't want in the generated code.
+     *            the actual catalog of the table as returned from DatabaseMetaData. This value
+     *            should only be set if the user configured a catalog. Otherwise the
+     *            DatabaseMetaData is reporting some database default that we don't want in the
+     *            generated code.
      * @param introspectedSchema
-     *            the actual schema of the table as returned from DatabaseMetaData. This value should only be set if the
-     *            user configured a schema. Otherwise the DatabaseMetaData is reporting some database default that we
-     *            don't want in the generated code.
+     *            the actual schema of the table as returned from DatabaseMetaData. This value
+     *            should only be set if the user configured a schema. Otherwise the
+     *            DatabaseMetaData is reporting some database default that we don't want in the
+     *            generated code.
      * @param introspectedTableName
      *            the actual table name as returned from DatabaseMetaData
      * @param domainObjectName
@@ -102,6 +87,9 @@ public class FullyQualifiedTable {
      * @param delimitIdentifiers
      *            if true, then the table identifiers will be delimited at runtime. The delimiter characters are
      *            obtained from the Context.
+     * @param domainObjectRenamingRule
+     *            If domainObjectName is not configured, we'll build the domain object named based on the tableName or runtimeTableName.
+     *            And then we use the domain object renameing rule to generate the final domain object name.
      * @param context
      *            the context
      */
@@ -110,7 +98,8 @@ public class FullyQualifiedTable {
             String domainObjectName, String alias,
             boolean ignoreQualifiersAtRuntime, String runtimeCatalog,
             String runtimeSchema, String runtimeTableName,
-            boolean delimitIdentifiers, Context context) {
+            boolean delimitIdentifiers, DomainObjectRenamingRule domainObjectRenamingRule,
+            Context context) {
         super();
         this.introspectedCatalog = introspectedCatalog;
         this.introspectedSchema = introspectedSchema;
@@ -119,7 +108,8 @@ public class FullyQualifiedTable {
         this.runtimeCatalog = runtimeCatalog;
         this.runtimeSchema = runtimeSchema;
         this.runtimeTableName = runtimeTableName;
-        
+        this.domainObjectRenamingRule = domainObjectRenamingRule;
+
         if (stringHasValue(domainObjectName)) {
             int index = domainObjectName.lastIndexOf('.');
             if (index == -1) {
@@ -231,7 +221,7 @@ public class FullyQualifiedTable {
     }
 
     /**
-     * This method returns a string that is the fully qualified table name, with
+     * Returns a string that is the fully qualified table name, with
      * underscores as the separator.
      * 
      * @return the namespace
@@ -258,11 +248,23 @@ public class FullyQualifiedTable {
     public String getDomainObjectName() {
         if (stringHasValue(domainObjectName)) {
             return domainObjectName;
-        } else if (stringHasValue(runtimeTableName)) {
-            return getCamelCaseString(runtimeTableName, true);
-        } else {
-            return getCamelCaseString(introspectedTableName, true);
         }
+
+        String finalDomainObjectName;
+        if (stringHasValue(runtimeTableName)) {
+            finalDomainObjectName =  getCamelCaseString(runtimeTableName, true);
+        } else {
+            finalDomainObjectName =  getCamelCaseString(introspectedTableName, true);
+        }
+
+        if (domainObjectRenamingRule != null) {
+            Pattern pattern = Pattern.compile(domainObjectRenamingRule.getSearchString());
+            String replaceString = domainObjectRenamingRule.getReplaceString();
+            replaceString = replaceString == null ? "" : replaceString; //$NON-NLS-1$
+            Matcher matcher = pattern.matcher(finalDomainObjectName);
+            finalDomainObjectName = matcher.replaceAll(replaceString);
+        }
+        return finalDomainObjectName;
     }
 
     /* (non-Javadoc)
@@ -324,7 +326,7 @@ public class FullyQualifiedTable {
      * Calculates a Java package fragment based on the table catalog and schema.
      * If qualifiers are ignored, then this method will return an empty string.
      * 
-     * This method is used for determining the sub package for Java client and 
+     * <p>This method is used for determining the sub package for Java client and
      * SQL map (XML) objects.  It ignores any sub-package added to the
      * domain object name in the table configuration.
      *
@@ -351,7 +353,7 @@ public class FullyQualifiedTable {
                 sb.append(introspectedSchema.toLowerCase());
             }
         }
-        
+
         // TODO - strip characters that are not valid in package names
         return sb.toString();
     }
@@ -360,7 +362,7 @@ public class FullyQualifiedTable {
      * Calculates a Java package fragment based on the table catalog and schema.
      * If qualifiers are ignored, then this method will return an empty string.
      * 
-     * This method is used for determining the sub package for Java model objects only.
+     * <p>This method is used for determining the sub package for Java model objects only.
      * It takes into account the possibility that a sub-package was added to the
      * domain object name in the table configuration.
      *
@@ -371,7 +373,7 @@ public class FullyQualifiedTable {
     public String getSubPackageForModel(boolean isSubPackagesEnabled) {
         StringBuilder sb = new StringBuilder();
         sb.append(getSubPackageForClientOrSqlMap(isSubPackagesEnabled));
-        
+
         if (stringHasValue(domainObjectSubPackage)) {
             sb.append('.');
             sb.append(domainObjectSubPackage);
@@ -394,5 +396,9 @@ public class FullyQualifiedTable {
         if (stringHasValue(endingDelimiter)) {
             sb.append(endingDelimiter);
         }
+    }
+
+    public String getDomainObjectSubPackage() {
+        return domainObjectSubPackage;
     }
 }

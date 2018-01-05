@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.mybatis.generator.api.dom.xml.Document;
  * @author Jeff Butler
  */
 public class GeneratedXmlFile extends GeneratedFile {
-    
+
     /** The document. */
     private Document document;
 
@@ -35,7 +35,7 @@ public class GeneratedXmlFile extends GeneratedFile {
 
     /** The is mergeable. */
     private boolean isMergeable;
-    
+
     /** The xml formatter. */
     private XmlFormatter xmlFormatter;
 
@@ -100,5 +100,9 @@ public class GeneratedXmlFile extends GeneratedFile {
     @Override
     public boolean isMergeable() {
         return isMergeable;
+    }
+
+    public void setMergeable(boolean isMergeable) {
+        this.isMergeable = isMergeable;
     }
 }

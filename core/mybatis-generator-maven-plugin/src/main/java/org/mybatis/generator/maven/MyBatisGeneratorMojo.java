@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,12 +24,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.mybatis.generator.api.MyBatisGenerator;
 import org.mybatis.generator.api.ShellCallback;
@@ -46,38 +48,45 @@ import org.mybatis.generator.logging.LogFactory;
 /**
  * Goal which generates MyBatis/iBATIS artifacts.
  */
-@Mojo(name = "generate",defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES,
+        requiresDependencyResolution = ResolutionScope.TEST)
 public class MyBatisGeneratorMojo extends AbstractMojo {
+    
+    private ThreadLocal<ClassLoader> savedClassloader = new ThreadLocal<ClassLoader>();
 
     /**
      * Maven Project.
      *
      */
-    @Parameter(property="project",required=true,readonly=true)
+    @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
     /**
      * Output Directory.
      */
-    @Parameter(property="mybatis.generator.outputDirectory", defaultValue="${project.build.directory}/generated-sources/mybatis-generator", required=true)
+    @Parameter(property = "mybatis.generator.outputDirectory",
+            defaultValue = "${project.build.directory}/generated-sources/mybatis-generator", required = true)
     private File outputDirectory;
 
     /**
      * Location of the configuration file.
      */
-    @Parameter(property="mybatis.generator.configurationFile",defaultValue="${project.basedir}/src/main/resources/generatorConfig.xml", required=true)
+    @Parameter(property = "mybatis.generator.configurationFile",
+            defaultValue = "${project.basedir}/src/main/resources/generatorConfig.xml", required = true)
     private File configurationFile;
 
     /**
      * Specifies whether the mojo writes progress messages to the log.
      */
-    @Parameter(property="mybatis.generator.verbose", defaultValue="false")
+    @Parameter(property = "mybatis.generator.verbose", defaultValue = "false")
     private boolean verbose;
 
     /**
-     * Specifies whether the mojo overwrites existing files. Default is false.
+     * Specifies whether the mojo overwrites existing Java files. Default is false.
+     * <br>
+     * Note that XML files are always merged.
      */
-    @Parameter(property="mybatis.generator.overwrite", defaultValue="false")
+    @Parameter(property = "mybatis.generator.overwrite", defaultValue = "false")
     private boolean overwrite;
 
     /**
@@ -85,60 +94,81 @@ public class MyBatisGeneratorMojo extends AbstractMojo {
      * then no script will be run. If not null, then jdbcDriver, jdbcURL must be
      * supplied also, and jdbcUserId and jdbcPassword may be supplied.
      */
-    @Parameter(property="mybatis.generator.sqlScript")
+    @Parameter(property = "mybatis.generator.sqlScript")
     private String sqlScript;
 
     /**
      * JDBC Driver to use if a sql.script.file is specified.
      */
-    @Parameter(property="mybatis.generator.jdbcDriver")
+    @Parameter(property = "mybatis.generator.jdbcDriver")
     private String jdbcDriver;
 
     /**
      * JDBC URL to use if a sql.script.file is specified.
      */
-    @Parameter(property="mybatis.generator.jdbcURL")
+    @Parameter(property = "mybatis.generator.jdbcURL")
     private String jdbcURL;
 
     /**
      * JDBC user ID to use if a sql.script.file is specified.
      */
-    @Parameter(property="mybatis.generator.jdbcUserId")
+    @Parameter(property = "mybatis.generator.jdbcUserId")
     private String jdbcUserId;
 
     /**
      * JDBC password to use if a sql.script.file is specified.
      */
-    @Parameter(property="mybatis.generator.jdbcPassword")
+    @Parameter(property = "mybatis.generator.jdbcPassword")
     private String jdbcPassword;
 
     /**
      * Comma delimited list of table names to generate.
      */
-    @Parameter(property="mybatis.generator.tableNames")
+    @Parameter(property = "mybatis.generator.tableNames")
     private String tableNames;
 
     /**
      * Comma delimited list of contexts to generate.
      */
-    @Parameter(property="mybatis.generator.contexts")
+    @Parameter(property = "mybatis.generator.contexts")
     private String contexts;
 
     /**
      * Skip generator.
      */
-    @Parameter(property="mybatis.generator.skip", defaultValue="false")
+    @Parameter(property = "mybatis.generator.skip", defaultValue = "false")
     private boolean skip;
+    
+    /**
+     * If true, then dependencies in scope compile, provided, and system scopes will be
+     * added to the classpath of the generator.  These dependencies will be searched for
+     * JDBC drivers, root classes, root interfaces, generator plugins, etc.
+     */
+    @Parameter(property = "mybatis.generator.includeCompileDependencies", defaultValue = "false")
+    private boolean includeCompileDependencies;
 
+    /**
+     * If true, then dependencies in all scopes will be
+     * added to the classpath of the generator.  These dependencies will be searched for
+     * JDBC drivers, root classes, root interfaces, generator plugins, etc.
+     */
+    @Parameter(property = "mybatis.generator.includeAllDependencies", defaultValue = "false")
+    private boolean includeAllDependencies;
+    
+    @Override
     public void execute() throws MojoExecutionException {
         if (skip) {
-            getLog().info( "MyBatis generator is skipped." );
+            getLog().info("MyBatis generator is skipped.");
             return;
         }
 
-    	LogFactory.setLogFactory(new MavenLogFactory(this));
+        saveClassLoader();
+        
+        LogFactory.setLogFactory(new MavenLogFactory(this));
 
-    	// add resource directories to the classpath.  This is required to support
+        calculateClassPath();
+
+        // add resource directories to the classpath.  This is required to support
         // use of a properties file in the build.  Typically, the properties file
         // is in the project's source tree, but the plugin classpath does not
         // include the project classpath.
@@ -148,7 +178,7 @@ public class MyBatisGeneratorMojo extends AbstractMojo {
             resourceDirectories.add(resource.getDirectory());
         }
         ClassLoader cl = ClassloaderUtility.getCustomClassloader(resourceDirectories);
-        ObjectFactory.addResourceClassLoader(cl);
+        ObjectFactory.addExternalClassLoader(cl);
 
         if (configurationFile == null) {
             throw new MojoExecutionException(
@@ -232,8 +262,40 @@ public class MyBatisGeneratorMojo extends AbstractMojo {
             resource.addInclude("**/*.xml");
             project.addResource(resource);
         }
+        
+        restoreClassLoader();
     }
 
+    private void calculateClassPath() throws MojoExecutionException {
+        if (includeCompileDependencies || includeAllDependencies) {
+            try {
+                // add the project compile classpath to the plugin classpath,
+                // so that the project dependency classes can be found
+                // directly, without adding the classpath to configuration's classPathEntries
+                // repeatedly.Examples are JDBC drivers, root classes, root interfaces, etc.
+                Set<String> entries = new HashSet<String>();
+                if (includeCompileDependencies) {
+                    entries.addAll(project.getCompileClasspathElements());
+                }
+                
+                if (includeAllDependencies) {
+                    entries.addAll(project.getTestClasspathElements());
+                }
+                
+                // remove the output directories (target/classes and target/test-classes)
+                // because this mojo runs in the generate-sources phase and
+                // those directories have not been created yet (typically)
+                entries.remove(project.getBuild().getOutputDirectory());
+                entries.remove(project.getBuild().getTestOutputDirectory());
+
+                ClassLoader contextClassLoader = ClassloaderUtility.getCustomClassloader(entries);
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
+            } catch (DependencyResolutionRequiredException e) {
+                throw new MojoExecutionException("Dependency Resolution Required", e);
+            }
+        }
+    }
+    
     private void runScriptIfNecessary() throws MojoExecutionException {
         if (sqlScript == null) {
             return;
@@ -247,5 +309,13 @@ public class MyBatisGeneratorMojo extends AbstractMojo {
 
     public File getOutputDirectory() {
         return outputDirectory;
+    }
+    
+    private void saveClassLoader() {
+        savedClassloader.set(Thread.currentThread().getContextClassLoader());
+    }
+
+    private void restoreClassLoader() {
+        Thread.currentThread().setContextClassLoader(savedClassloader.get());
     }
 }

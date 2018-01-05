@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,11 +52,12 @@ public class JavaCodeGenerationTest {
             fail("Generated Java File " + generatedJavaFile.getFileName() + " will not compile");
         }
     }
-    
+
     @Parameters
     public static List<GeneratedJavaFile> generateJavaFiles() throws Exception {
         List<GeneratedJavaFile> generatedFiles = new ArrayList<GeneratedJavaFile>();
         generatedFiles.addAll(generateJavaFilesMybatis());
+        generatedFiles.addAll(generateJavaFilesMybatisDsql());
         generatedFiles.addAll(generateJavaFilesIbatis());
         return generatedFiles;
     }
@@ -64,6 +65,11 @@ public class JavaCodeGenerationTest {
     private static List<GeneratedJavaFile> generateJavaFilesMybatis() throws Exception {
         createDatabase();
         return generateJavaFiles("/scripts/generatorConfig.xml");
+    }
+
+    private static List<GeneratedJavaFile> generateJavaFilesMybatisDsql() throws Exception {
+        createDatabase();
+        return generateJavaFiles("/scripts/generatorConfig_Dsql.xml");
     }
 
     private static List<GeneratedJavaFile> generateJavaFilesIbatis() throws Exception {
@@ -75,9 +81,9 @@ public class JavaCodeGenerationTest {
         List<String> warnings = new ArrayList<String>();
         ConfigurationParser cp = new ConfigurationParser(warnings);
         Configuration config = cp.parseConfiguration(JavaCodeGenerationTest.class.getResourceAsStream(configFile));
-            
+
         DefaultShellCallback shellCallback = new DefaultShellCallback(true);
-        
+
         MyBatisGenerator myBatisGenerator = new MyBatisGenerator(config, shellCallback, warnings);
         myBatisGenerator.generate(null, null, null, false);
         return myBatisGenerator.getGeneratedJavaFiles();

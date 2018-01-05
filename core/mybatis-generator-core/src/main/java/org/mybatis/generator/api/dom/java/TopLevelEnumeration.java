@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,25 +20,16 @@ import static org.mybatis.generator.api.dom.OutputUtilities.newLine;
 import static org.mybatis.generator.internal.util.messages.Messages.getString;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
- * The Class TopLevelEnumeration.
- *
- * @author Jeff Butler
- */
 public class TopLevelEnumeration extends InnerEnum implements CompilationUnit {
-    
-    /** The imported types. */
+
     private Set<FullyQualifiedJavaType> importedTypes;
 
-    /** The static imports. */
     private Set<String> staticImports;
 
-    /** The file comment lines. */
     private List<String> fileCommentLines;
 
     /**
@@ -54,9 +45,7 @@ public class TopLevelEnumeration extends InnerEnum implements CompilationUnit {
         staticImports = new TreeSet<String>();
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#getFormattedContent()
-     */
+    @Override
     public String getFormattedContent() {
         StringBuilder sb = new StringBuilder();
 
@@ -80,11 +69,11 @@ public class TopLevelEnumeration extends InnerEnum implements CompilationUnit {
             sb.append(';');
             newLine(sb);
         }
-        
+
         if (staticImports.size() > 0) {
             newLine(sb);
         }
-        
+
         Set<String> importStrings = calculateImports(importedTypes);
         for (String importString : importStrings) {
             sb.append(importString);
@@ -100,37 +89,27 @@ public class TopLevelEnumeration extends InnerEnum implements CompilationUnit {
         return sb.toString();
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#getImportedTypes()
-     */
+    @Override
     public Set<FullyQualifiedJavaType> getImportedTypes() {
-        return Collections.unmodifiableSet(importedTypes);
+        return importedTypes;
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#getSuperClass()
-     */
+    @Override
     public FullyQualifiedJavaType getSuperClass() {
         throw new UnsupportedOperationException(getString("RuntimeError.11")); //$NON-NLS-1$
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#isJavaInterface()
-     */
+    @Override
     public boolean isJavaInterface() {
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#isJavaEnumeration()
-     */
+    @Override
     public boolean isJavaEnumeration() {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#addImportedType(org.mybatis.generator.api.dom.java.FullyQualifiedJavaType)
-     */
+    @Override
     public void addImportedType(FullyQualifiedJavaType importedType) {
         if (importedType.isExplicitlyImported()
                 && !importedType.getPackageName().equals(
@@ -139,44 +118,32 @@ public class TopLevelEnumeration extends InnerEnum implements CompilationUnit {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#addFileCommentLine(java.lang.String)
-     */
+    @Override
     public void addFileCommentLine(String commentLine) {
         fileCommentLines.add(commentLine);
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#getFileCommentLines()
-     */
+    @Override
     public List<String> getFileCommentLines() {
         return fileCommentLines;
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#addImportedTypes(java.util.Set)
-     */
+    @Override
     public void addImportedTypes(Set<FullyQualifiedJavaType> importedTypes) {
         this.importedTypes.addAll(importedTypes);
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#getStaticImports()
-     */
+    @Override
     public Set<String> getStaticImports() {
         return staticImports;
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#addStaticImport(java.lang.String)
-     */
+    @Override
     public void addStaticImport(String staticImport) {
         staticImports.add(staticImport);
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.dom.java.CompilationUnit#addStaticImports(java.util.Set)
-     */
+    @Override
     public void addStaticImports(Set<String> staticImports) {
         this.staticImports.addAll(staticImports);
     }

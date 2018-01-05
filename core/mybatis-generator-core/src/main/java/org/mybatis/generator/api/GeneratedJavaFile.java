@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import org.mybatis.generator.api.dom.java.CompilationUnit;
  * @author Jeff Butler
  */
 public class GeneratedJavaFile extends GeneratedFile {
-    
+
     /** The compilation unit. */
     private CompilationUnit compilationUnit;
-    
+
     /** The file encoding. */
     private String fileEncoding;
-    
+
     /** The java formatter. */
     private JavaFormatter javaFormatter;
 
@@ -70,7 +70,7 @@ public class GeneratedJavaFile extends GeneratedFile {
             JavaFormatter javaFormatter) {
         this(compilationUnit, targetProject, null, javaFormatter);
     }
-    
+
     /* (non-Javadoc)
      * @see org.mybatis.generator.api.GeneratedFile#getFormattedContent()
      */
@@ -90,6 +90,7 @@ public class GeneratedJavaFile extends GeneratedFile {
     /* (non-Javadoc)
      * @see org.mybatis.generator.api.GeneratedFile#getTargetPackage()
      */
+    @Override
     public String getTargetPackage() {
         return compilationUnit.getType().getPackageName();
     }

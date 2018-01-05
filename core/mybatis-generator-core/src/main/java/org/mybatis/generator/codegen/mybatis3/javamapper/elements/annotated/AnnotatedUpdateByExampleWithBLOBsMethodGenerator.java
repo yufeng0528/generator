@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,24 +24,27 @@ import org.mybatis.generator.codegen.mybatis3.javamapper.elements.UpdateByExampl
  * 
  * @author Jeff Butler
  */
-public class AnnotatedUpdateByExampleWithBLOBsMethodGenerator extends
-    UpdateByExampleWithBLOBsMethodGenerator {
+public class AnnotatedUpdateByExampleWithBLOBsMethodGenerator extends UpdateByExampleWithBLOBsMethodGenerator {
 
     public AnnotatedUpdateByExampleWithBLOBsMethodGenerator() {
         super();
     }
 
     @Override
-    public void addMapperAnnotations(Interface interfaze, Method method) {
+    public void addMapperAnnotations(Method method) {
         FullyQualifiedJavaType fqjt = new FullyQualifiedJavaType(introspectedTable.getMyBatis3SqlProviderType());
-        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.UpdateProvider")); //$NON-NLS-1$
         StringBuilder sb = new StringBuilder();
         sb.append("@UpdateProvider(type="); //$NON-NLS-1$
         sb.append(fqjt.getShortName());
         sb.append(".class, method=\""); //$NON-NLS-1$
         sb.append(introspectedTable.getUpdateByExampleWithBLOBsStatementId());
         sb.append("\")"); //$NON-NLS-1$
-        
+
         method.addAnnotation(sb.toString());
+    }
+
+    @Override
+    public void addExtraImports(Interface interfaze) {
+        interfaze.addImportedType(new FullyQualifiedJavaType("org.apache.ibatis.annotations.UpdateProvider")); //$NON-NLS-1$
     }
 }

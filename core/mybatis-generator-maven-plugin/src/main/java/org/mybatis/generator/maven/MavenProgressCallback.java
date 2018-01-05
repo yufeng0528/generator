@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.mybatis.generator.internal.NullProgressCallback;
 
 /**
- * This callback logs progress messages with the Maven logger
+ * This callback logs progress messages with the Maven logger.
  * 
  * @author Jeff Butler
  *
@@ -29,9 +29,6 @@ public class MavenProgressCallback extends NullProgressCallback {
     private Log log;
     private boolean verbose;
 
-    /**
-     * 
-     */
     public MavenProgressCallback(Log log, boolean verbose) {
         super();
         this.log = log;

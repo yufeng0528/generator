@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,13 +22,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+import org.mybatis.generator.internal.ObjectFactory;
 import org.mybatis.generator.internal.util.StringUtility;
 import org.mybatis.generator.internal.util.messages.Messages;
 
@@ -75,8 +78,20 @@ public class SqlScriptRunner {
         Connection connection = null;
 
         try {
-            Class.forName(driver);
-            connection = DriverManager.getConnection(url, userid, password);
+            Class<?> driverClass = ObjectFactory.externalClassForName(driver);
+            Driver theDriver = (Driver) driverClass.newInstance();
+            
+            Properties properties = new Properties();
+            if (userid != null) {
+                properties.setProperty("user", userid);
+            }
+            
+            if (password != null) {
+                properties.setProperty("password", password);
+            }
+            
+            connection = theDriver.connect(url, properties);
+            connection.setAutoCommit(false);
 
             Statement statement = connection.createStatement();
 
@@ -99,6 +114,10 @@ public class SqlScriptRunner {
             throw new MojoExecutionException("SqlException: " + e.getMessage(), e);
         } catch (IOException e) {
             throw new MojoExecutionException("IOException: " + e.getMessage(), e);
+        } catch (InstantiationException e) {
+            throw new MojoExecutionException("InstantiationException: " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            throw new MojoExecutionException("IllegalAccessException: " + e.getMessage());
         } finally {
             closeConnection(connection);
         }
@@ -125,8 +144,7 @@ public class SqlScriptRunner {
             try {
                 connection.close();
             } catch (SQLException e) {
-                // ignore
-                ;
+                log.debug("SQLException on close connection", e);
             }
         }
     }
@@ -136,14 +154,13 @@ public class SqlScriptRunner {
             try {
                 statement.close();
             } catch (SQLException e) {
-                // ignore
-                ;
+                log.debug("SQLException on close statement", e);
             }
         }
     }
 
     private String readStatement(BufferedReader br) throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         String line;
 
@@ -169,7 +186,7 @@ public class SqlScriptRunner {
         String s = sb.toString().trim();
 
         if (s.length() > 0) {
-            log.debug((Messages.getString("Progress.13", s))); //$NON-NLS-1$
+            log.debug(Messages.getString("Progress.13", s)); //$NON-NLS-1$
         }
 
         return s.length() > 0 ? s : null;
@@ -179,13 +196,13 @@ public class SqlScriptRunner {
         this.log = log;
     }
     
-    private BufferedReader getScriptReader() throws MojoExecutionException, FileNotFoundException {
+    private BufferedReader getScriptReader() throws MojoExecutionException, IOException {
         BufferedReader answer;
         
         if (sourceFile.startsWith("classpath:")) {
             String resource = sourceFile.substring("classpath:".length());
-            InputStream is = 
-                Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
+            URL url = ObjectFactory.getResource(resource);
+            InputStream is = url.openStream();
             if (is == null) {
                 throw new MojoExecutionException("SQL script file does not exist: " + resource);
             }

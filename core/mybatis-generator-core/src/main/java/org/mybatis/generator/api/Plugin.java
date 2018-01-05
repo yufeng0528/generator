@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ import org.mybatis.generator.config.Context;
  * the code generation process. These methods can be used to extend or modify
  * the generated code. Clients may implement this interface in its entirety, or
  * extend the PluginAdapter (highly recommended).
- * <p>
- * Plugins have a lifecycle. In general, the lifecycle is this:
+ * 
+ * <p>Plugins have a lifecycle. In general, the lifecycle is this:
  * 
  * <ol>
  * <li>The setXXX methods are called one time</li>
@@ -50,14 +50,14 @@ import org.mybatis.generator.config.Context;
  * <li>The contextGenerateAdditionalXmlFiles() method is called one time</li>
  * </ol>
  * 
- * Plugins are related to contexts - so each context will have its own set of
+ * <p>Plugins are related to contexts - so each context will have its own set of
  * plugins. If the same plugin is specified in multiple contexts, then each
  * context will hold a unique instance of the plugin.
- * <p>
- * Plugins are called, and initialized, in the same order they are specified in
+ * 
+ * <p>Plugins are called, and initialized, in the same order they are specified in
  * the configuration.
- * <p>
- * The clientXXX, modelXXX, and sqlMapXXX methods are called by the code
+ * 
+ * <p>The clientXXX, modelXXX, and sqlMapXXX methods are called by the code
  * generators. If you replace the default code generators with other
  * implementations, these methods may not be called.
  * 
@@ -67,17 +67,10 @@ import org.mybatis.generator.config.Context;
  */
 public interface Plugin {
     
-    /**
-     * The Enum ModelClassType.
-     */
     public enum ModelClassType {
-        
-        /** The primary key. */
         PRIMARY_KEY, 
- /** The base record. */
- BASE_RECORD, 
- /** The record with blobs. */
- RECORD_WITH_BLOBS
+        BASE_RECORD, 
+        RECORD_WITH_BLOBS
     }
 
     /**
@@ -101,14 +94,14 @@ public interface Plugin {
      * can implement this method to override any of the default attributes, or change the results of database
      * introspection, before any code generation activities occur. Attributes are listed as static Strings with the
      * prefix ATTR_ in IntrospectedTable.
-     * <p>
-     * A good example of overriding an attribute would be the case where a user wanted to change the name of one of the
-     * generated classes, change the target package, or change the name of the generated SQL map file.
-     * <p>
-     * <b>Warning:</b> Anything that is listed as an attribute should not be changed by one of the other plugin methods.
-     * For example, if you want to change the name of a generated example class, you should not simply change the Type
-     * in the <code>modelExampleClassGenerated()</code> method. If you do, the change will not be reflected in other
-     * generated artifacts.
+     * 
+     * <p>A good example of overriding an attribute would be the case where a user wanted to change the name of one
+     * of the generated classes, change the target package, or change the name of the generated SQL map file.
+     * 
+     * <p><b>Warning:</b> Anything that is listed as an attribute should not be changed by one of the other plugin
+     * methods. For example, if you want to change the name of a generated example class, you should not simply change
+     * the Type in the <code>modelExampleClassGenerated()</code> method. If you do, the change will not be reflected
+     * in other generated artifacts.
      *
      * @param introspectedTable
      *            the introspected table
@@ -221,279 +214,6 @@ public interface Plugin {
             TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
 
     /**
-     * This method is called when the deleteByExample method has been generated
-     * in the client implementation class.
-     * 
-     * @param method
-     *            the generated deleteByExample method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientDeleteByExampleMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the deleteByPrimaryKey method has been
-     * generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated deleteByPrimaryKey method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientDeleteByPrimaryKeyMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the insert method has been generated in the
-     * client implementation class.
-     * 
-     * @param method
-     *            the generated insert method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientInsertMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the insert selective method has been generated
-     * in the client implementation class.
-     * 
-     * @param method
-     *            the generated insert method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientInsertSelectiveMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the selectByExampleWithBLOBs method has been
-     * generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated selectByExampleWithBLOBs method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientSelectByExampleWithBLOBsMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the selectByExampleWithoutBLOBs method has
-     * been generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated selectByExampleWithoutBLOBs method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientSelectByExampleWithoutBLOBsMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the selectByPrimaryKey method has been
-     * generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated selectByPrimaryKey method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientSelectByPrimaryKeyMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByExampleSelective method has been
-     * generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated updateByExampleSelective method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByExampleSelectiveMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByExampleWithBLOBs method has been
-     * generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated updateByExampleWithBLOBs method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByExampleWithBLOBsMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByExampleWithoutBLOBs method has
-     * been generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated updateByExampleWithoutBLOBs method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByExampleWithoutBLOBsMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByPrimaryKeySelective method has
-     * been generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated updateByPrimaryKeySelective method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByPrimaryKeySelectiveMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByPrimaryKeyWithBLOBs method has
-     * been generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated updateByPrimaryKeyWithBLOBs method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByPrimaryKeyWithBLOBsMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByPrimaryKeyWithoutBLOBs method has
-     * been generated in the client implementation class.
-     * 
-     * @param method
-     *            the generated updateByPrimaryKeyWithBLOBs method
-     * @param topLevelClass
-     *            the partially implemented client implementation class. You can
-     *            add additional imported classes to the implementation class if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByPrimaryKeyWithoutBLOBsMethodGenerated(Method method,
-            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
-
-    /**
      * This method is called when the countByExample method has been generated
      * in the client interface.
      * 
@@ -513,6 +233,27 @@ public interface Plugin {
      */
     boolean clientCountByExampleMethodGenerated(Method method,
             Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the deleteByExample method has been generated
+     * in the client implementation class.
+     * 
+     * @param method
+     *            the generated deleteByExample method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientDeleteByExampleMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
 
     /**
      * This method is called when the deleteByExample method has been generated
@@ -557,6 +298,27 @@ public interface Plugin {
             Interface interfaze, IntrospectedTable introspectedTable);
 
     /**
+     * This method is called when the deleteByPrimaryKey method has been
+     * generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated deleteByPrimaryKey method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientDeleteByPrimaryKeyMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
      * This method is called when the insert method has been generated in the
      * client interface.
      * 
@@ -578,6 +340,27 @@ public interface Plugin {
             IntrospectedTable introspectedTable);
 
     /**
+     * This method is called when the insert method has been generated in the
+     * client implementation class.
+     * 
+     * @param method
+     *            the generated insert method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientInsertMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
      * This method is called when the insert selective method has been generated
      * in the client interface.
      * 
@@ -596,6 +379,405 @@ public interface Plugin {
      *         plugins.
      */
     boolean clientInsertSelectiveMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the insert selective method has been generated
+     * in the client implementation class.
+     * 
+     * @param method
+     *            the generated insert method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientInsertSelectiveMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the selectByExampleWithBLOBs method has been
+     * generated in the client interface.
+     * 
+     * @param method
+     *            the generated selectByExampleWithBLOBs method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientSelectByExampleWithBLOBsMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the selectByExampleWithBLOBs method has been
+     * generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated selectByExampleWithBLOBs method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientSelectByExampleWithBLOBsMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the selectByExampleWithoutBLOBs method has
+     * been generated in the client interface.
+     * 
+     * @param method
+     *            the generated selectByExampleWithoutBLOBs method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientSelectByExampleWithoutBLOBsMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the selectByExampleWithoutBLOBs method has
+     * been generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated selectByExampleWithoutBLOBs method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientSelectByExampleWithoutBLOBsMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the selectByPrimaryKey method has been
+     * generated in the client interface.
+     * 
+     * @param method
+     *            the generated selectByPrimaryKey method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientSelectByPrimaryKeyMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the selectByPrimaryKey method has been
+     * generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated selectByPrimaryKey method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientSelectByPrimaryKeyMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByExampleSelective method has been
+     * generated in the client interface.
+     * 
+     * @param method
+     *            the generated updateByExampleSelective method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByExampleSelectiveMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByExampleSelective method has been
+     * generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated updateByExampleSelective method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByExampleSelectiveMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByExampleWithBLOBs method has been
+     * generated in the client interface.
+     * 
+     * @param method
+     *            the generated updateByExampleWithBLOBs method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByExampleWithBLOBsMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByExampleWithBLOBs method has been
+     * generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated updateByExampleWithBLOBs method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByExampleWithBLOBsMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByExampleWithoutBLOBs method has
+     * been generated in the client interface.
+     * 
+     * @param method
+     *            the generated updateByExampleWithoutBLOBs method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByExampleWithoutBLOBsMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByExampleWithoutBLOBs method has
+     * been generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated updateByExampleWithoutBLOBs method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByExampleWithoutBLOBsMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByPrimaryKeySelective method has
+     * been generated in the client interface.
+     * 
+     * @param method
+     *            the generated updateByPrimaryKeySelective method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByPrimaryKeySelectiveMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByPrimaryKeySelective method has
+     * been generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated updateByPrimaryKeySelective method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByPrimaryKeySelectiveMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByPrimaryKeyWithBLOBs method has
+     * been generated in the client interface.
+     * 
+     * @param method
+     *            the generated updateByPrimaryKeyWithBLOBs method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByPrimaryKeyWithBLOBsMethodGenerated(Method method,
+            Interface interfaze, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByPrimaryKeyWithBLOBs method has
+     * been generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated updateByPrimaryKeyWithBLOBs method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByPrimaryKeyWithBLOBsMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByPrimaryKeyWithoutBLOBs method has
+     * been generated in the client implementation class.
+     * 
+     * @param method
+     *            the generated updateByPrimaryKeyWithBLOBs method
+     * @param topLevelClass
+     *            the partially implemented client implementation class. You can
+     *            add additional imported classes to the implementation class if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByPrimaryKeyWithoutBLOBsMethodGenerated(Method method,
+            TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
+
+    /**
+     * This method is called when the updateByPrimaryKeyWithoutBLOBs method has
+     * been generated in the client interface.
+     * 
+     * @param method
+     *            the generated updateByPrimaryKeyWithoutBLOBs method
+     * @param interfaze
+     *            the partially implemented client interface. You can add
+     *            additional imported classes to the interface if
+     *            necessary.
+     * @param introspectedTable
+     *            The class containing information about the table as
+     *            introspected from the database
+     * @return true if the method should be generated, false if the generated
+     *         method should be ignored. In the case of multiple plugins, the
+     *         first plugin returning false will disable the calling of further
+     *         plugins.
+     */
+    boolean clientUpdateByPrimaryKeyWithoutBLOBsMethodGenerated(Method method,
             Interface interfaze, IntrospectedTable introspectedTable);
 
     /**
@@ -641,195 +823,6 @@ public interface Plugin {
     boolean clientSelectAllMethodGenerated(Method method,
             TopLevelClass topLevelClass, IntrospectedTable introspectedTable);
     
-    /**
-     * This method is called when the selectByExampleWithBLOBs method has been
-     * generated in the client interface.
-     * 
-     * @param method
-     *            the generated selectByExampleWithBLOBs method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientSelectByExampleWithBLOBsMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the selectByExampleWithoutBLOBs method has
-     * been generated in the client interface.
-     * 
-     * @param method
-     *            the generated selectByExampleWithoutBLOBs method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientSelectByExampleWithoutBLOBsMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the selectByPrimaryKey method has been
-     * generated in the client interface.
-     * 
-     * @param method
-     *            the generated selectByPrimaryKey method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientSelectByPrimaryKeyMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByExampleSelective method has been
-     * generated in the client interface.
-     * 
-     * @param method
-     *            the generated updateByExampleSelective method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByExampleSelectiveMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByExampleWithBLOBs method has been
-     * generated in the client interface.
-     * 
-     * @param method
-     *            the generated updateByExampleWithBLOBs method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByExampleWithBLOBsMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByExampleWithoutBLOBs method has
-     * been generated in the client interface.
-     * 
-     * @param method
-     *            the generated updateByExampleWithoutBLOBs method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByExampleWithoutBLOBsMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByPrimaryKeySelective method has
-     * been generated in the client interface.
-     * 
-     * @param method
-     *            the generated updateByPrimaryKeySelective method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByPrimaryKeySelectiveMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByPrimaryKeyWithBLOBs method has
-     * been generated in the client interface.
-     * 
-     * @param method
-     *            the generated updateByPrimaryKeyWithBLOBs method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByPrimaryKeyWithBLOBsMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
-    /**
-     * This method is called when the updateByPrimaryKeyWithoutBLOBs method has
-     * been generated in the client interface.
-     * 
-     * @param method
-     *            the generated updateByPrimaryKeyWithoutBLOBs method
-     * @param interfaze
-     *            the partially implemented client interface. You can add
-     *            additional imported classes to the interface if
-     *            necessary.
-     * @param introspectedTable
-     *            The class containing information about the table as
-     *            introspected from the database
-     * @return true if the method should be generated, false if the generated
-     *         method should be ignored. In the case of multiple plugins, the
-     *         first plugin returning false will disable the calling of further
-     *         plugins.
-     */
-    boolean clientUpdateByPrimaryKeyWithoutBLOBsMethodGenerated(Method method,
-            Interface interfaze, IntrospectedTable introspectedTable);
-
     /**
      * This method is called after the field is generated for a specific column
      * in a table.

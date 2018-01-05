@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-       Copyright 2006-2016 the original author or authors.
+       Copyright 2006-2017 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
     <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin" />
     <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin" />
     <plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+    <plugin type="org.mybatis.generator.plugins.MapperAnnotationPlugin" />
 
     <connectionFactory>
       <property name="driverClass" value="org.hsqldb.jdbcDriver"/>
@@ -47,7 +48,7 @@
       <property name="enableSubPackages" value="true" />
     </javaClientGenerator>
 
-    <table tableName="FieldsOnly" />
+    <table tableName="FieldsOnly" domainObjectName="subpackage.Fieldsonly"/>
     <table tableName="PKOnly" />
     <table tableName="PKFields" alias="B" >
       <columnOverride column="wierd$Field" delimitedColumnName="true"/>
@@ -244,6 +245,9 @@
         <except column="col13"/>
       </ignoreColumnsByRegex>
     </table>
+    <table tableName="suffix_rename">
+      <domainObjectRenamingRule searchString="^Suffix" replaceString=""/>
+    </table>
   </context>
   
   <context id="miscellaneousTests_NoClient" targetRuntime="MyBatis3">
@@ -336,6 +340,37 @@
     </table>
   </context>
 
+  <context id="miscellaneousTests_immutable_conditional" targetRuntime="MyBatis3" defaultModelType="conditional">
+    <jdbcConnection driverClass="org.hsqldb.jdbcDriver"
+        connectionURL="jdbc:hsqldb:mem:aname"
+        userId="sa" />
+
+    <javaModelGenerator targetPackage="mbg.test.mb3.generated.conditional.immutable.model" targetProject="MAVEN">
+      <property name="trimStrings" value="true" />
+      <property name="immutable" value="true"/>
+    </javaModelGenerator>
+
+    <sqlMapGenerator targetPackage="mbg.test.mb3.generated.conditional.immutable.xml"  targetProject="MAVEN">
+    </sqlMapGenerator>
+
+    <javaClientGenerator type="XMLMAPPER" targetPackage="mbg.test.mb3.generated.conditional.immutable.mapper"  targetProject="MAVEN">
+    </javaClientGenerator>
+
+    <table tableName="FieldsOnly" />
+    <table tableName="FieldsBlobs" />
+    <table tableName="PKOnly" />
+    <table tableName="PKBlobs" />
+    <table tableName="PKFields" alias="B" >
+      <property name="immutable" value="false"/>
+      <property name="constructorBased" value="true"/>
+      <columnOverride column="wierd$Field" delimitedColumnName="true"/>
+    </table>
+    <table tableName="PKFieldsBlobs" alias="A" />
+    <table tableName="CompoundKey">
+      <property name="constructorBased" value="true"/>
+    </table>
+  </context>
+
   <context id="FlatJava5_Annotated" defaultModelType="flat">
     <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin" />
     <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin"/>
@@ -353,7 +388,7 @@
       <property name="enableSubPackages" value="true" />
     </javaClientGenerator>
 
-    <table tableName="FieldsOnly" />
+    <table tableName="FieldsOnly" domainObjectName="subpackage.Fieldsonly"/>
     <table tableName="PKOnly" />
     <table tableName="PKFields" alias="B" >
       <columnOverride column="wierd$Field" delimitedColumnName="true"/>

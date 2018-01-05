@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,17 +41,22 @@ public class Method extends JavaElement {
     /** The name. */
     private String name;
 
+    /** The type parameters. */
+    private List<TypeParameter> typeParameters;
+
     /** The parameters. */
     private List<Parameter> parameters;
 
     /** The exceptions. */
     private List<FullyQualifiedJavaType> exceptions;
-    
+
     /** The is synchronized. */
     private boolean isSynchronized;
-    
+
     /** The is native. */
     private boolean isNative;
+
+    private boolean isDefault;
 
     /**
      * Instantiates a new method.
@@ -60,7 +65,7 @@ public class Method extends JavaElement {
         // use a default name to avoid malformed code
         this("bar"); //$NON-NLS-1$
     }
-    
+
     /**
      * Instantiates a new method.
      *
@@ -70,11 +75,12 @@ public class Method extends JavaElement {
     public Method(String name) {
         super();
         bodyLines = new ArrayList<String>();
+        typeParameters = new ArrayList<TypeParameter>();
         parameters = new ArrayList<Parameter>();
         exceptions = new ArrayList<FullyQualifiedJavaType>();
         this.name = name;
     }
-    
+
     /**
      * Copy constructor. Not a truly deep copy, but close enough for most purposes.
      *
@@ -84,12 +90,14 @@ public class Method extends JavaElement {
     public Method(Method original) {
         super(original);
         bodyLines = new ArrayList<String>();
+        typeParameters = new ArrayList<TypeParameter>();
         parameters = new ArrayList<Parameter>();
         exceptions = new ArrayList<FullyQualifiedJavaType>();
         this.bodyLines.addAll(original.bodyLines);
         this.constructor = original.constructor;
         this.exceptions.addAll(original.exceptions);
         this.name = original.name;
+        this.typeParameters.addAll(original.typeParameters);
         this.parameters.addAll(original.parameters);
         this.returnType = original.returnType;
         this.isNative = original.isNative;
@@ -167,7 +175,13 @@ public class Method extends JavaElement {
 
         OutputUtilities.javaIndent(sb, indentLevel);
 
-        if (!interfaceMethod) {
+        if (interfaceMethod) {
+            if (isStatic()) {
+                sb.append("static "); //$NON-NLS-1$
+            } else if (isDefault()) {
+                sb.append("default "); //$NON-NLS-1$
+            }
+        } else {
             sb.append(getVisibility().getValue());
 
             if (isStatic()) {
@@ -177,16 +191,31 @@ public class Method extends JavaElement {
             if (isFinal()) {
                 sb.append("final "); //$NON-NLS-1$
             }
-            
+
             if (isSynchronized()) {
                 sb.append("synchronized "); //$NON-NLS-1$
             }
-            
+
             if (isNative()) {
                 sb.append("native "); //$NON-NLS-1$
             } else if (bodyLines.size() == 0) {
                 sb.append("abstract "); //$NON-NLS-1$
             }
+        }
+
+        if (!getTypeParameters().isEmpty()) {
+            sb.append("<"); //$NON-NLS-1$
+            boolean comma = false;
+            for (TypeParameter typeParameter : getTypeParameters()) {
+                if (comma) {
+                    sb.append(", "); //$NON-NLS-1$
+                } else {
+                    comma = true;
+                }
+
+                sb.append(typeParameter.getFormattedContent(compilationUnit));
+            }
+            sb.append("> "); //$NON-NLS-1$
         }
 
         if (!constructor) {
@@ -314,6 +343,37 @@ public class Method extends JavaElement {
     }
 
     /**
+     * Gets the type parameters.
+     *
+     * @return the type parameters
+     */
+    public List<TypeParameter> getTypeParameters() {
+        return typeParameters;
+    }
+
+    /**
+     * Adds the type parameter.
+     *
+     * @param typeParameter
+     *            the type parameter
+     */
+    public void addTypeParameter(TypeParameter typeParameter) {
+        typeParameters.add(typeParameter);
+    }
+
+    /**
+     * Adds the parameter.
+     *
+     * @param index
+     *            the index
+     * @param typeParameter
+     *            the type parameter
+     */
+    public void addTypeParameter(int index, TypeParameter typeParameter) {
+        typeParameters.add(index, typeParameter);
+    }
+
+    /**
      * Gets the parameters.
      *
      * @return the parameters
@@ -418,5 +478,13 @@ public class Method extends JavaElement {
      */
     public void setNative(boolean isNative) {
         this.isNative = isNative;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public void setDefault(boolean isDefault) {
+        this.isDefault = isDefault;
     }
 }

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,16 +29,16 @@ public abstract class AbstractJavaProviderMethodGenerator extends
     protected static final FullyQualifiedJavaType NEW_BUILDER_IMPORT = new FullyQualifiedJavaType("org.apache.ibatis.jdbc.SQL"); //$NON-NLS-1$
     protected boolean useLegacyBuilder;
     protected final String builderPrefix;
-    
+
     public AbstractJavaProviderMethodGenerator(boolean useLegacyBuilder) {
         super();
         this.useLegacyBuilder = useLegacyBuilder;
         if (useLegacyBuilder) {
-        	builderPrefix = ""; //$NON-NLS-1$
+            builderPrefix = ""; //$NON-NLS-1$
         } else {
-        	builderPrefix = "sql."; //$NON-NLS-1$
+            builderPrefix = "sql."; //$NON-NLS-1$
         }
     }
-    
+
     public abstract void addClassElements(TopLevelClass topLevelClass);
 }

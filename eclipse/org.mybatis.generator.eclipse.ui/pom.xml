@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.mybatis.generator</groupId>
     <artifactId>org.mybatis.generator.eclipse.parent</artifactId>
-    <version>1.3.5-SNAPSHOT</version>
+    <version>1.3.7-SNAPSHOT</version>
     <relativePath>../org.mybatis.generator.eclipse.parent</relativePath>
   </parent>
 
@@ -20,10 +20,12 @@
         <configuration>
           <filesets>
             <fileset>
-              <!-- Delete the generated ant support library -->
-              <directory>lib</directory>
               <!-- Delete the directory where DTDs are copied -->
               <directory>dtds</directory>
+            </fileset>
+            <fileset>
+              <!-- Delete the generated ant support library -->
+              <directory>lib</directory>
             </fileset>
           </filesets>
         </configuration>
@@ -48,4 +50,5 @@
       </plugin>
     </plugins>
   </build>
+  <name>Plugin UI</name>
 </project>

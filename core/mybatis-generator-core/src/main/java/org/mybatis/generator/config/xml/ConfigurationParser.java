@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class ConfigurationParser {
      * an additional property set.  Typically this property set will be Ant or Maven properties
      * specified in the build.xml file or the POM.
      * 
-     * If there are name collisions between the different property sets, they will be 
+     * <p>If there are name collisions between the different property sets, they will be 
      * resolved in this order:
      * 
      * <ol>
@@ -81,8 +81,8 @@ public class ConfigurationParser {
      * </ol>
      * 
      * @param extraProperties an (optional) set of properties used to resolve property
-     *   references in the configuration file
-     * @param warnings
+     *     references in the configuration file
+     * @param warnings any warnings are added to this array
      */
     public ConfigurationParser(Properties extraProperties, List<String> warnings) {
         super();
@@ -181,14 +181,14 @@ public class ConfigurationParser {
     private Configuration parseIbatorConfiguration(Element rootNode)
             throws XMLParserException {
         IbatorConfigurationParser parser = new IbatorConfigurationParser(
-        		extraProperties);
+                extraProperties);
         return parser.parseIbatorConfiguration(rootNode);
     }
 
     private Configuration parseMyBatisGeneratorConfiguration(Element rootNode)
             throws XMLParserException {
         MyBatisGeneratorConfigurationParser parser = new MyBatisGeneratorConfigurationParser(
-        		extraProperties);
+                extraProperties);
         return parser.parseConfiguration(rootNode);
     }
 }

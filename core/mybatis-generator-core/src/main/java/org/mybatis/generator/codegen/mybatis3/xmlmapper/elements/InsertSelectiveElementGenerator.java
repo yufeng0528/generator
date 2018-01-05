@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public class InsertSelectiveElementGenerator extends
         GeneratedKey gk = introspectedTable.getGeneratedKey();
         if (gk != null) {
             IntrospectedColumn introspectedColumn = introspectedTable
-                .getColumn(gk.getColumn());
+                    .getColumn(gk.getColumn());
             // if the column is null, then it's a configuration error. The
             // warning has already been reported
             if (introspectedColumn != null) {
@@ -94,27 +94,27 @@ public class InsertSelectiveElementGenerator extends
                 // if it is a sequence column, it is not optional
                 // This is required for MyBatis3 because MyBatis3 parses
                 // and calculates the SQL before executing the selectKey
-                
+
                 // if it is primitive, we cannot do a null check
                 sb.setLength(0);
                 sb.append(MyBatis3FormattingUtilities
-                    .getEscapedColumnName(introspectedColumn));
+                        .getEscapedColumnName(introspectedColumn));
                 sb.append(',');
                 insertTrimElement.addElement(new TextElement(sb.toString()));
 
                 sb.setLength(0);
                 sb.append(MyBatis3FormattingUtilities
-                    .getParameterClause(introspectedColumn));
+                        .getParameterClause(introspectedColumn));
                 sb.append(',');
                 valuesTrimElement.addElement(new TextElement(sb.toString()));
 
                 continue;
-            }            
-            
-            XmlElement insertNotNullElement = new XmlElement("if"); //$NON-NLS-1$
+            }
+
             sb.setLength(0);
             sb.append(introspectedColumn.getJavaProperty());
             sb.append(" != null"); //$NON-NLS-1$
+            XmlElement insertNotNullElement = new XmlElement("if"); //$NON-NLS-1$
             insertNotNullElement.addAttribute(new Attribute(
                     "test", sb.toString())); //$NON-NLS-1$
 
@@ -125,10 +125,10 @@ public class InsertSelectiveElementGenerator extends
             insertNotNullElement.addElement(new TextElement(sb.toString()));
             insertTrimElement.addElement(insertNotNullElement);
 
-            XmlElement valuesNotNullElement = new XmlElement("if"); //$NON-NLS-1$
             sb.setLength(0);
             sb.append(introspectedColumn.getJavaProperty());
             sb.append(" != null"); //$NON-NLS-1$
+            XmlElement valuesNotNullElement = new XmlElement("if"); //$NON-NLS-1$
             valuesNotNullElement.addAttribute(new Attribute(
                     "test", sb.toString())); //$NON-NLS-1$
 

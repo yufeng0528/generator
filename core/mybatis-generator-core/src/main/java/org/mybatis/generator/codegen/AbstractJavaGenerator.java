@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,11 +27,6 @@ import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.config.PropertyRegistry;
 
-/**
- * 
- * @author Jeff Butler
- * 
- */
 public abstract class AbstractJavaGenerator extends AbstractGenerator {
     public abstract List<CompilationUnit> getCompilationUnits();
 
@@ -62,12 +57,16 @@ public abstract class AbstractJavaGenerator extends AbstractGenerator {
     }
 
     protected void addDefaultConstructor(TopLevelClass topLevelClass) {
+        topLevelClass.addMethod(getDefaultConstructor(topLevelClass));
+    }
+
+    protected Method getDefaultConstructor(TopLevelClass topLevelClass) {
         Method method = new Method();
         method.setVisibility(JavaVisibility.PUBLIC);
         method.setConstructor(true);
         method.setName(topLevelClass.getType().getShortName());
         method.addBodyLine("super();"); //$NON-NLS-1$
         context.getCommentGenerator().addGeneralMethodComment(method, introspectedTable);
-        topLevelClass.addMethod(method);
+        return method;
     }
 }

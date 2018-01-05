@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -116,13 +116,13 @@ public class ProviderApplyWhereMethodGenerator extends
         "}", //$NON-NLS-1$
         "" //$NON-NLS-1$
     };
-    
+
     private static final String[] LEGACY_ENDING_METHOD_LINES = {
         "if (sb.length() > 0) {", //$NON-NLS-1$
         "WHERE(sb.toString());", //$NON-NLS-1$
         "}" //$NON-NLS-1$
     };
-    
+
     private static final String[] ENDING_METHOD_LINES = {
         "if (sb.length() > 0) {", //$NON-NLS-1$
         "sql.WHERE(sb.toString());", //$NON-NLS-1$
@@ -139,9 +139,9 @@ public class ProviderApplyWhereMethodGenerator extends
         Set<FullyQualifiedJavaType> importedTypes = new TreeSet<FullyQualifiedJavaType>();
 
         if (useLegacyBuilder) {
-        	staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.WHERE"); //$NON-NLS-1$
+            staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.WHERE"); //$NON-NLS-1$
         } else {
-        	importedTypes.add(NEW_BUILDER_IMPORT);
+            importedTypes.add(NEW_BUILDER_IMPORT);
         }
         
         importedTypes.add(new FullyQualifiedJavaType(
@@ -168,17 +168,17 @@ public class ProviderApplyWhereMethodGenerator extends
         for (String methodLine : BEGINNING_METHOD_LINES) {
             method.addBodyLine(methodLine);
         }
-        
+
         if (useLegacyBuilder) {
-        	for (String methodLine : LEGACY_ENDING_METHOD_LINES) {
-        		method.addBodyLine(methodLine);
-        	}
+            for (String methodLine : LEGACY_ENDING_METHOD_LINES) {
+                method.addBodyLine(methodLine);
+            }
         } else {
-        	for (String methodLine : ENDING_METHOD_LINES) {
-        		method.addBodyLine(methodLine);
-        	}
+            for (String methodLine : ENDING_METHOD_LINES) {
+                method.addBodyLine(methodLine);
+            }
         }
-        
+
         if (context.getPlugins().providerApplyWhereMethodGenerated(method, topLevelClass,
                 introspectedTable)) {
             topLevelClass.addStaticImports(staticImports);

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.mybatis.generator.api.dom.java.Parameter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 
 /**
+ * Generates the Select By Example without BLOBs method.
  * 
  * @author Jeff Butler
  * 
@@ -49,6 +50,7 @@ public class SelectByExampleWithoutBLOBsMethodGenerator extends
 
         if (generateForJava5) {
             method.addSuppressTypeWarningsAnnotation();
+            method.addAnnotation("@Override"); //$NON-NLS-1$
         }
 
         StringBuilder sb = new StringBuilder();

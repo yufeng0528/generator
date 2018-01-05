@@ -16,11 +16,8 @@
  */
 package org.mybatis.generator.eclipse.core.merge;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import static org.mybatis.generator.eclipse.core.merge.EclipseDomUtils.getCompilationUnitFromSource;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,7 +27,6 @@ import java.util.Set;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -47,6 +43,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
+import org.mybatis.generator.eclipse.core.merge.InvalidExistingFileException.ErrorCode;
 import org.mybatis.generator.exception.ShellException;
 
 /**
@@ -67,44 +64,35 @@ import org.mybatis.generator.exception.ShellException;
 public class JavaFileMerger {
 
     private String newJavaSource;
-    private String existingFilePath;
+    private String existingJavaSource;
     private String[] javaDocTags;
-    private String fileEncoding;
 
-    public JavaFileMerger(String newJavaSource, String existingFilePath,
-            String[] javaDocTags, String fileEncoding) {
+    public JavaFileMerger(String newJavaSource, String existingJavaSource,
+            String[] javaDocTags) {
         super();
         this.newJavaSource = newJavaSource;
-        this.existingFilePath = existingFilePath;
+        this.existingJavaSource = existingJavaSource;
         this.javaDocTags = javaDocTags;
-        this.fileEncoding = fileEncoding;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public String getMergedSource() throws ShellException {
-        ASTParser astParser = ASTParser.newParser(AST.JLS3);
-        NewJavaFileVisitor newJavaFileVisitor = visitNewJavaFile(astParser);
+    public String getMergedSource() throws ShellException, InvalidExistingFileException {
+        NewJavaFileVisitor newJavaFileVisitor = visitNewJavaFile();
 
-        String existingFile = getExistingFileContents();
-        IDocument document = new Document(existingFile);
+        IDocument document = new Document(existingJavaSource);
 
         // delete generated stuff, and collect imports
         ExistingJavaFileVisitor visitor = new ExistingJavaFileVisitor(
                 javaDocTags);
 
-        astParser.setSource(existingFile.toCharArray());
-        CompilationUnit cu = (CompilationUnit) astParser.createAST(null);
+        CompilationUnit cu = getCompilationUnitFromSource(existingJavaSource);
         AST ast = cu.getAST();
         cu.recordModifications();
         cu.accept(visitor);
 
         TypeDeclaration typeDeclaration = visitor.getTypeDeclaration();
         if (typeDeclaration == null) {
-            StringBuffer sb = new StringBuffer();
-            sb.append("No types defined in the file ");
-            sb.append(existingFilePath);
-
-            throw new ShellException(sb.toString());
+            throw new InvalidExistingFileException(ErrorCode.NO_TYPES_DEFINED_IN_FILE);
         }
 
         // reconcile the superinterfaces
@@ -150,9 +138,7 @@ public class JavaFileMerger {
         }
 
         // regenerate the CompilationUnit to reflect all the deletes and changes
-        astParser.setSource(document.get().toCharArray());
-        CompilationUnit strippedCu = (CompilationUnit) astParser
-                .createAST(null);
+        CompilationUnit strippedCu = getCompilationUnitFromSource(document.get());
 
         // find the top level public type declaration
         TypeDeclaration topLevelType = null;
@@ -260,57 +246,14 @@ public class JavaFileMerger {
      * characteristics of the new file, and a lost of new nodes that need to be
      * incorporated into the existing file.
      * 
-     * @param astParser
      * @return
      */
-    private NewJavaFileVisitor visitNewJavaFile(ASTParser astParser) {
-        astParser.setSource(newJavaSource.toCharArray());
-        CompilationUnit cu = (CompilationUnit) astParser.createAST(null);
+    private NewJavaFileVisitor visitNewJavaFile() {
+        CompilationUnit cu = getCompilationUnitFromSource(newJavaSource);
         NewJavaFileVisitor newVisitor = new NewJavaFileVisitor();
         cu.accept(newVisitor);
 
         return newVisitor;
-    }
-
-    private String getExistingFileContents() throws ShellException {
-        File file = new File(existingFilePath);
-
-        if (!file.exists()) {
-            // this should not happen because MyBatis Generator only returns the
-            // path
-            // calculated by the eclipse callback
-            StringBuilder sb = new StringBuilder();
-            sb.append("The file ");
-            sb.append(existingFilePath);
-            sb.append(" does not exist");
-            throw new ShellException(sb.toString());
-        }
-
-        try {
-            StringBuilder sb = new StringBuilder();
-            FileInputStream fis = new FileInputStream(file);
-            InputStreamReader isr;
-            if (fileEncoding == null) {
-                isr = new InputStreamReader(fis);
-            } else {
-                isr = new InputStreamReader(fis, fileEncoding);
-            }
-            BufferedReader br = new BufferedReader(isr);
-            char[] buffer = new char[1024];
-            int returnedBytes = br.read(buffer);
-            while (returnedBytes != -1) {
-                sb.append(buffer, 0, returnedBytes);
-                returnedBytes = br.read(buffer);
-            }
-
-            br.close();
-            return sb.toString();
-        } catch (IOException e) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("IOException reading the file ");
-            sb.append(existingFilePath);
-            throw new ShellException(sb.toString(), e);
-        }
     }
 
     @SuppressWarnings("unchecked")

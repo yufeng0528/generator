@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.mybatis.generator.plugins;
 import java.util.List;
 import java.util.Properties;
 
-import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.IntrospectedTable;
+import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
@@ -28,11 +28,11 @@ import org.mybatis.generator.api.dom.java.TopLevelClass;
 /**
  * This plugin adds the java.io.Serializable marker interface to all generated
  * model objects.
- * <p>
- * This plugin demonstrates adding capabilities to generated Java artifacts, and
+ * 
+ * <p>This plugin demonstrates adding capabilities to generated Java artifacts, and
  * shows the proper way to add imports to a compilation unit.
- * <p>
- * Important: This is a simplistic implementation of serializable and does not
+ * 
+ * <p>Important: This is a simplistic implementation of serializable and does not
  * attempt to do any versioning of classes.
  * 
  * @author Jeff Butler
@@ -51,6 +51,7 @@ public class SerializablePlugin extends PluginAdapter {
         gwtSerializable = new FullyQualifiedJavaType("com.google.gwt.user.client.rpc.IsSerializable"); //$NON-NLS-1$
     }
 
+    @Override
     public boolean validate(List<String> warnings) {
         // this plugin is always valid
         return true;
@@ -62,7 +63,7 @@ public class SerializablePlugin extends PluginAdapter {
         addGWTInterface = Boolean.valueOf(properties.getProperty("addGWTInterface")); //$NON-NLS-1$
         suppressJavaInterface = Boolean.valueOf(properties.getProperty("suppressJavaInterface")); //$NON-NLS-1$
     }
-    
+
     @Override
     public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass,
             IntrospectedTable introspectedTable) {
@@ -90,7 +91,7 @@ public class SerializablePlugin extends PluginAdapter {
             topLevelClass.addImportedType(gwtSerializable);
             topLevelClass.addSuperInterface(gwtSerializable);
         }
-        
+
         if (!suppressJavaInterface) {
             topLevelClass.addImportedType(serializable);
             topLevelClass.addSuperInterface(serializable);

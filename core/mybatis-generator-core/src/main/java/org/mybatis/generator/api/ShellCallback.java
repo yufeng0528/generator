@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.mybatis.generator.exception.ShellException;
  * to work. A "shell" is defined as the execution environment (i.e. an
  * Eclipse plugin, and Ant task, a NetBeans plugin, etc.)
  * 
- * The default ShellCallback that is very low function and does
+ * <p>The default ShellCallback that is very low function and does
  * not support the merging of Java files. The default shell callback is 
  * appropriate for use in well controlled environments where no changes
  * made to generated Java files.
@@ -33,19 +33,19 @@ import org.mybatis.generator.exception.ShellException;
  * @author Jeff Butler
  */
 public interface ShellCallback {
-    
+
     /**
      * This method is called to ask the shell to resolve a project/package combination into a directory on the file
      * system. This method is called repeatedly (once for each generated file), so it would be wise for an implementing
      * class to cache results.
      * 
-     * The returned <code>java.io.File</code> object:
+     * <p>The returned <code>java.io.File</code> object:
      * <ul>
      * <li>Must be a directory</li>
      * <li>Must exist</li>
      * </ul>
      * 
-     * The default shell callback interprets both values as directories and simply concatenates the two values to
+     * <p>The default shell callback interprets both values as directories and simply concatenates the two values to
      * generate the default directory.
      *
      * @param targetProject
@@ -67,7 +67,7 @@ public interface ShellCallback {
      * (formatted). The generator will write the merged source as-is to the file
      * system.
      * 
-     * A merge typically follows these steps:
+     * <p>A merge typically follows these steps:
      * <ol>
      * <li>Delete any methods/fields in the existing file that have the
      * specified JavaDoc tag</li>
@@ -81,13 +81,13 @@ public interface ShellCallback {
      * <li>Format the resulting source string</li>
      * </ol>
      * 
-     * This method is called only if you return <code>true</code> from
+     * <p>This method is called only if you return <code>true</code> from
      * <code>isMergeSupported()</code>.
      * 
      * @param newFileSource
      *            the source of the newly generated Java file
-     * @param existingFileFullPath
-     *            the fully qualified path name of the existing Java file
+     * @param existingFile
+     *            the existing Java file
      * @param javadocTags
      *            the JavaDoc tags that denotes which methods and fields in the
      *            old file to delete (if the Java element has any of these tags,
@@ -103,7 +103,7 @@ public interface ShellCallback {
      *             existing file will remain undisturbed. The generator will add the
      *             exception message to the list of warnings automatically.
      */
-    String mergeJavaFile(String newFileSource, String existingFileFullPath,
+    String mergeJavaFile(String newFileSource, File existingFile,
             String[] javadocTags, String fileEncoding) throws ShellException;
 
     /**

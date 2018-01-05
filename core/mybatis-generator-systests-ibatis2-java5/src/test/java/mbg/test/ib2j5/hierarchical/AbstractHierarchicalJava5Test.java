@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,12 +34,13 @@ public abstract class AbstractHierarchicalJava5Test extends AbstractTest {
     
     private GenericApplicationContext factory;
 
+    @Override
     public void setUp() throws Exception {
-    	super.setUp();
-		factory = new GenericApplicationContext();
+        super.setUp();
+        factory = new GenericApplicationContext();
         Resource res = new ClassPathResource("/mbg/test/ib2j5/hierarchical/SpringBeans.xml");
-		XmlBeanDefinitionReader r = new XmlBeanDefinitionReader(factory);
-		r.loadBeanDefinitions(res);
+        XmlBeanDefinitionReader r = new XmlBeanDefinitionReader(factory);
+        r.loadBeanDefinitions(res);
     }
 
     protected FieldsonlyDAO getFieldsonlyDAO() {

@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,8 +31,7 @@ import org.mybatis.generator.api.dom.java.TopLevelClass;
  * @author Jeff Butler
  * 
  */
-public class ProviderDeleteByExampleMethodGenerator extends
-        AbstractJavaProviderMethodGenerator {
+public class ProviderDeleteByExampleMethodGenerator extends AbstractJavaProviderMethodGenerator {
 
     public ProviderDeleteByExampleMethodGenerator(boolean useLegacyBuilder) {
         super(useLegacyBuilder);
@@ -44,13 +43,13 @@ public class ProviderDeleteByExampleMethodGenerator extends
         Set<FullyQualifiedJavaType> importedTypes = new TreeSet<FullyQualifiedJavaType>();
 
         if (useLegacyBuilder) {
-        	staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.BEGIN"); //$NON-NLS-1$
-        	staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.DELETE_FROM"); //$NON-NLS-1$
-        	staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.SQL"); //$NON-NLS-1$
+            staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.BEGIN"); //$NON-NLS-1$
+            staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.DELETE_FROM"); //$NON-NLS-1$
+            staticImports.add("org.apache.ibatis.jdbc.SqlBuilder.SQL"); //$NON-NLS-1$
         } else {
-        	importedTypes.add(NEW_BUILDER_IMPORT);
+            importedTypes.add(NEW_BUILDER_IMPORT);
         }
-        
+
         FullyQualifiedJavaType fqjt = new FullyQualifiedJavaType(introspectedTable.getExampleType());
         importedTypes.add(fqjt);
 
@@ -64,17 +63,17 @@ public class ProviderDeleteByExampleMethodGenerator extends
                 introspectedTable);
 
         if (useLegacyBuilder) {
-        	method.addBodyLine("BEGIN();"); //$NON-NLS-1$
-        	method.addBodyLine(String.format("DELETE_FROM(\"%s\");", //$NON-NLS-1$
-                escapeStringForJava(introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime())));
-        	method.addBodyLine("applyWhere(example, false);"); //$NON-NLS-1$
-        	method.addBodyLine("return SQL();"); //$NON-NLS-1$
+            method.addBodyLine("BEGIN();"); //$NON-NLS-1$
+            method.addBodyLine(String.format("DELETE_FROM(\"%s\");", //$NON-NLS-1$
+                    escapeStringForJava(introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime())));
+            method.addBodyLine("applyWhere(example, false);"); //$NON-NLS-1$
+            method.addBodyLine("return SQL();"); //$NON-NLS-1$
         } else {
-        	method.addBodyLine("SQL sql = new SQL();"); //$NON-NLS-1$
-        	method.addBodyLine(String.format("sql.DELETE_FROM(\"%s\");", //$NON-NLS-1$
-                escapeStringForJava(introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime())));
-        	method.addBodyLine("applyWhere(sql, example, false);"); //$NON-NLS-1$
-        	method.addBodyLine("return sql.toString();"); //$NON-NLS-1$
+            method.addBodyLine("SQL sql = new SQL();"); //$NON-NLS-1$
+            method.addBodyLine(String.format("sql.DELETE_FROM(\"%s\");", //$NON-NLS-1$
+                    escapeStringForJava(introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime())));
+            method.addBodyLine("applyWhere(sql, example, false);"); //$NON-NLS-1$
+            method.addBodyLine("return sql.toString();"); //$NON-NLS-1$
         }
         
         if (context.getPlugins().providerDeleteByExampleMethodGenerated(method, topLevelClass,

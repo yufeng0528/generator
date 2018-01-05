@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
     protected boolean forceBigDecimals;
 
     protected Map<Integer, JdbcTypeInformation> typeMap;
-    
+
     public JavaTypeResolverDefaultImpl() {
         super();
         properties = new Properties();
@@ -122,6 +122,7 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
                 new FullyQualifiedJavaType(String.class.getName())));
     }
 
+    @Override
     public void addConfigurationProperties(Properties properties) {
         this.properties.putAll(properties);
         forceBigDecimals = StringUtility
@@ -129,6 +130,7 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
                         .getProperty(PropertyRegistry.TYPE_RESOLVER_FORCE_BIG_DECIMALS));
     }
 
+    @Override
     public FullyQualifiedJavaType calculateJavaType(
             IntrospectedColumn introspectedColumn) {
         FullyQualifiedJavaType answer = null;
@@ -145,7 +147,7 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
     
     protected FullyQualifiedJavaType overrideDefaultType(IntrospectedColumn column, FullyQualifiedJavaType defaultType) {
         FullyQualifiedJavaType answer = defaultType;
-        
+
         switch (column.getJdbcType()) {
         case Types.BIT:
             answer = calculateBitReplacement(column, defaultType);
@@ -154,6 +156,8 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
         case Types.NUMERIC:
             answer = calculateBigDecimalReplacement(column, defaultType);
             break;
+        default:
+            break;
         }
 
         return answer;
@@ -161,19 +165,19 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
     
     protected FullyQualifiedJavaType calculateBitReplacement(IntrospectedColumn column, FullyQualifiedJavaType defaultType) {
         FullyQualifiedJavaType answer;
-        
+
         if (column.getLength() > 1) {
             answer = new FullyQualifiedJavaType("byte[]"); //$NON-NLS-1$
         } else {
             answer = defaultType;
         }
-        
+
         return answer;
     }
     
     protected FullyQualifiedJavaType calculateBigDecimalReplacement(IntrospectedColumn column, FullyQualifiedJavaType defaultType) {
         FullyQualifiedJavaType answer;
-        
+
         if (column.getScale() > 0 || column.getLength() > 18 || forceBigDecimals) {
             answer = defaultType;
         } else if (column.getLength() > 9) {
@@ -183,10 +187,11 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
         } else {
             answer = new FullyQualifiedJavaType(Short.class.getName());
         }
-        
+
         return answer;
     }
 
+    @Override
     public String calculateJdbcTypeName(IntrospectedColumn introspectedColumn) {
         String answer = null;
         JdbcTypeInformation jdbcTypeInformation = typeMap
@@ -199,10 +204,12 @@ public class JavaTypeResolverDefaultImpl implements JavaTypeResolver {
         return answer;
     }
 
+    @Override
     public void setWarnings(List<String> warnings) {
         this.warnings = warnings;
     }
 
+    @Override
     public void setContext(Context context) {
         this.context = context;
     }

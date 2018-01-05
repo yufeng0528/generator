@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2016 the original author or authors.
+ *    Copyright 2006-2017 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,22 +22,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.IntrospectedTable;
+import org.mybatis.generator.api.PluginAdapter;
 
 /**
  * This plugin demonstrates overriding the initialized() method to rename the
  * generated example classes. Instead of xxxExample, the classes will be named
- * xxxCriteria
+ * xxxCriteria.
  * 
- * This plugin accepts two properties:
+ * <p>This plugin accepts two properties:
+ * 
  * <ul>
  * <li><tt>searchString</tt> (required) the regular expression of the name
  * search.</li>
  * <li><tt>replaceString</tt> (required) the replacement String.</li>
  * </ul>
  * 
- * For example, to change the name of the generated Example classes from
+ * <p>For example, to change the name of the generated Example classes from
  * xxxExample to xxxCriteria, specify the following:
  * 
  * <dl>
@@ -56,12 +57,10 @@ public class RenameExampleClassPlugin extends PluginAdapter {
     private String replaceString;
     private Pattern pattern;
 
-    /**
-     * 
-     */
     public RenameExampleClassPlugin() {
     }
 
+    @Override
     public boolean validate(List<String> warnings) {
 
         searchString = properties.getProperty("searchString"); //$NON-NLS-1$
