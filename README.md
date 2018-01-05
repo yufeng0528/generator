@@ -15,6 +15,8 @@
 	<generatorConfiguration>
 		  <classPathEntry location="jar包的路径/mysql-connector-java-5.1.17.jar" />
 		  <context id="DB2Tables" targetRuntime="MyBatis3">
+			  <property name="javaFileEncoding" value="UTF-8"/> 
+
 			  <plugin type="org.mybatis.generator.plugins.MySQLPaginationPlugin" />
 			  <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin" >
 			      <property name="searchString" value="Example$"/>
