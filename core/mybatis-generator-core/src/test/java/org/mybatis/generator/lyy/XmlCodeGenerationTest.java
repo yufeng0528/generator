@@ -68,6 +68,7 @@ public class XmlCodeGenerationTest {
     @Parameters
     public static List<GeneratedXmlFile> generateXmlFiles() throws Exception {
         List<GeneratedXmlFile> generatedFiles = new ArrayList<GeneratedXmlFile>();
+        generatedFiles.addAll(generateXmlFilesMybatis2());
         generatedFiles.addAll(generateXmlFilesMybatis());
         generatedFiles.addAll(generateXmlFilesIbatis());
         return generatedFiles;
@@ -76,6 +77,11 @@ public class XmlCodeGenerationTest {
     private static List<GeneratedXmlFile> generateXmlFilesMybatis() throws Exception {
         JavaCodeGenerationTest.createDatabase();
         return generateXmlFiles("/scripts/generatorConfig.xml");
+    }
+    
+    private static List<GeneratedXmlFile> generateXmlFilesMybatis2() throws Exception {
+        JavaCodeGenerationTest.createDatabase2();
+        return generateXmlFiles("/scripts/lyy_test.xml");
     }
 
     private static List<GeneratedXmlFile> generateXmlFilesIbatis() throws Exception {
