@@ -49,6 +49,7 @@ import org.mybatis.generator.config.IgnoredColumn;
 import org.mybatis.generator.config.IgnoredColumnException;
 import org.mybatis.generator.config.IgnoredColumnPattern;
 import org.mybatis.generator.config.JDBCConnectionConfiguration;
+import org.mybatis.generator.config.JavaClientDaoGeneratorConfiguration;
 import org.mybatis.generator.config.JavaClientGeneratorConfiguration;
 import org.mybatis.generator.config.JavaModelGeneratorConfiguration;
 import org.mybatis.generator.config.JavaTypeResolverConfiguration;
@@ -202,6 +203,8 @@ public class MyBatisGeneratorConfigurationParser {
                 parseSqlMapGenerator(context, childNode);
             } else if ("javaClientGenerator".equals(childNode.getNodeName())) { //$NON-NLS-1$
                 parseJavaClientGenerator(context, childNode);
+            } else if ("javaClientDaoGenerator".equals(childNode.getNodeName())) { //$NON-NLS-1$
+            	parseJavaClientDaoGenerator(context, childNode);
             } else if ("table".equals(childNode.getNodeName())) { //$NON-NLS-1$
                 parseTable(context, childNode);
             }
@@ -620,6 +623,38 @@ public class MyBatisGeneratorConfigurationParser {
         JavaClientGeneratorConfiguration javaClientGeneratorConfiguration = new JavaClientGeneratorConfiguration();
 
         context.setJavaClientGeneratorConfiguration(javaClientGeneratorConfiguration);
+
+        Properties attributes = parseAttributes(node);
+        String type = attributes.getProperty("type"); //$NON-NLS-1$
+        String targetPackage = attributes.getProperty("targetPackage"); //$NON-NLS-1$
+        String targetProject = attributes.getProperty("targetProject"); //$NON-NLS-1$
+        String implementationPackage = attributes
+                .getProperty("implementationPackage"); //$NON-NLS-1$
+
+        javaClientGeneratorConfiguration.setConfigurationType(type);
+        javaClientGeneratorConfiguration.setTargetPackage(targetPackage);
+        javaClientGeneratorConfiguration.setTargetProject(targetProject);
+        javaClientGeneratorConfiguration
+                .setImplementationPackage(implementationPackage);
+
+        NodeList nodeList = node.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node childNode = nodeList.item(i);
+
+            if (childNode.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+
+            if ("property".equals(childNode.getNodeName())) { //$NON-NLS-1$
+                parseProperty(javaClientGeneratorConfiguration, childNode);
+            }
+        }
+    }
+    
+    private void parseJavaClientDaoGenerator(Context context, Node node) {
+        JavaClientDaoGeneratorConfiguration javaClientGeneratorConfiguration = new JavaClientDaoGeneratorConfiguration();
+
+        context.setJavaClientDaoGeneratorConfiguration(javaClientGeneratorConfiguration);
 
         Properties attributes = parseAttributes(node);
         String type = attributes.getProperty("type"); //$NON-NLS-1$

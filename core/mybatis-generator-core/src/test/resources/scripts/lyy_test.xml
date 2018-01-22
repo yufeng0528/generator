@@ -55,9 +55,13 @@
 	      <property name="enableSubPackages" value="true" />
 	    </sqlMapGenerator>
 		
-		<javaClientGenerator type="XMLMAPPER" targetPackage="yike.dao" targetProject="MAVEN">  
+		<javaClientGenerator type="XMLMAPPER" targetPackage="yike.mapper" targetProject="MAVEN">  
 		  <property name="enableSubPackages" value="true" />
-		</javaClientGenerator>  
+		</javaClientGenerator>
+		
+		<javaClientDaoGenerator targetPackage="yike.dao" targetProject="MAVEN">  
+		  <property name="enableSubPackages" value="true" />
+		</javaClientDaoGenerator> 
 		
 	    <table tableName="promotion_info" domainObjectName="PromotionInfo" enableCountByExample="true" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true" selectByExampleQueryId="true">
 	      <generatedKey column="id" sqlStatement="JDBC"/>

@@ -63,6 +63,8 @@ public class Context extends PropertyHolder {
     private JavaModelGeneratorConfiguration javaModelGeneratorConfiguration;
 
     private JavaClientGeneratorConfiguration javaClientGeneratorConfiguration;
+    
+    private JavaClientDaoGeneratorConfiguration javaClientDaoGeneratorConfiguration;
 
     private ArrayList<TableConfiguration> tableConfigurations;
 
@@ -165,6 +167,10 @@ public class Context extends PropertyHolder {
         if (javaClientGeneratorConfiguration != null) {
             javaClientGeneratorConfiguration.validate(errors, id);
         }
+        
+        if (javaClientDaoGeneratorConfiguration != null) {
+			javaClientDaoGeneratorConfiguration.validate(errors, id);
+		}
 
         IntrospectedTable it = null;
         try {
@@ -294,6 +300,10 @@ public class Context extends PropertyHolder {
         if (javaClientGeneratorConfiguration != null) {
             xmlElement.addElement(javaClientGeneratorConfiguration.toXmlElement());
         }
+        
+        if (javaClientDaoGeneratorConfiguration != null) {
+			xmlElement.addElement(javaClientDaoGeneratorConfiguration.toXmlElement());
+		}
 
         for (TableConfiguration tableConfiguration : tableConfigurations) {
             xmlElement.addElement(tableConfiguration.toXmlElement());
@@ -564,4 +574,12 @@ public class Context extends PropertyHolder {
     public void setConnectionFactoryConfiguration(ConnectionFactoryConfiguration connectionFactoryConfiguration) {
         this.connectionFactoryConfiguration = connectionFactoryConfiguration;
     }
+
+	public JavaClientDaoGeneratorConfiguration getJavaClientDaoGeneratorConfiguration() {
+		return javaClientDaoGeneratorConfiguration;
+	}
+
+	public void setJavaClientDaoGeneratorConfiguration(JavaClientDaoGeneratorConfiguration javaClientDaoGeneratorConfiguration) {
+		this.javaClientDaoGeneratorConfiguration = javaClientDaoGeneratorConfiguration;
+	}
 }

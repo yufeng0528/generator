@@ -31,6 +31,7 @@ import org.mybatis.generator.codegen.AbstractXmlGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.AnnotatedClientGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.JavaMapperGenerator;
 import org.mybatis.generator.codegen.mybatis3.javamapper.MixedClientGenerator;
+import org.mybatis.generator.codegen.mybatis3.javamapper.elements.dao.DAOGenerator;
 import org.mybatis.generator.codegen.mybatis3.model.BaseRecordGenerator;
 import org.mybatis.generator.codegen.mybatis3.model.ExampleGenerator;
 import org.mybatis.generator.codegen.mybatis3.model.PrimaryKeyGenerator;
@@ -47,6 +48,8 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
     protected List<AbstractJavaGenerator> javaModelGenerators;
 
     protected List<AbstractJavaGenerator> clientGenerators;
+    
+    protected List<AbstractJavaGenerator> clientDaoGenerators;
 
     protected AbstractXmlGenerator xmlMapperGenerator;
 
@@ -54,6 +57,7 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
         super(TargetRuntime.MYBATIS3);
         javaModelGenerators = new ArrayList<AbstractJavaGenerator>();
         clientGenerators = new ArrayList<AbstractJavaGenerator>();
+        clientDaoGenerators = new ArrayList<AbstractJavaGenerator>();
     }
 
     @Override
@@ -63,6 +67,8 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
         
         AbstractJavaClientGenerator javaClientGenerator =
                 calculateClientGenerators(warnings, progressCallback);
+        
+        calculateClientDaoGenerators(warnings, progressCallback);
             
         calculateXmlMapperGenerator(javaClientGenerator, warnings, progressCallback);
     }
@@ -98,6 +104,23 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
 
         return javaGenerator;
     }
+    
+    protected AbstractJavaClientGenerator calculateClientDaoGenerators(List<String> warnings,
+            ProgressCallback progressCallback) {
+        if (!rules.generateJavaClient()) {
+            return null;
+        }
+        
+        AbstractJavaClientGenerator javaGenerator = createJavaClientDaoGenerator();
+        if (javaGenerator == null) {
+            return null;
+        }
+
+        initializeAbstractGenerator(javaGenerator, warnings, progressCallback);
+        clientDaoGenerators.add(javaGenerator);
+
+        return javaGenerator;
+    }
 
     protected AbstractJavaClientGenerator createJavaClientGenerator() {
         if (context.getJavaClientGeneratorConfiguration() == null) {
@@ -120,6 +143,16 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
             javaGenerator = (AbstractJavaClientGenerator) ObjectFactory
                     .createInternalObject(type);
         }
+
+        return javaGenerator;
+    }
+    
+    protected AbstractJavaClientGenerator createJavaClientDaoGenerator() {
+        if (context.getJavaClientDaoGeneratorConfiguration() == null) {
+            return null;
+        }
+        
+        AbstractJavaClientGenerator javaGenerator = new DAOGenerator();
 
         return javaGenerator;
     }
@@ -197,6 +230,20 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
                 answer.add(gjf);
             }
         }
+        
+        //新增
+        for (AbstractJavaGenerator javaGenerator : clientDaoGenerators) {
+            List<CompilationUnit> compilationUnits = javaGenerator
+                    .getCompilationUnits();
+            for (CompilationUnit compilationUnit : compilationUnits) {
+                GeneratedJavaFile gjf = new GeneratedJavaFile(compilationUnit,
+                        context.getJavaClientGeneratorConfiguration()
+                                .getTargetProject(),
+                                context.getProperty(PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING),
+                                context.getJavaFormatter());
+                answer.add(gjf);
+            }
+        }
 
         return answer;
     }
@@ -223,6 +270,7 @@ public class IntrospectedTableMyBatis3Impl extends IntrospectedTable {
     public int getGenerationSteps() {
         return javaModelGenerators.size()
                 + clientGenerators.size()
+                + clientDaoGenerators.size()
                 + (xmlMapperGenerator == null ? 0 : 1);
     }
 
