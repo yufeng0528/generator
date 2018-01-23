@@ -39,6 +39,9 @@ public class MySQLPaginationPlugin extends PluginAdapter {
 
 	@Override
     public boolean modelExampleClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
+		if (topLevelClass.getType().getFullyQualifiedName().endsWith("DAO")) {
+			return true;
+		}
         // add field, getter, setter for limit clause
         addLimit(topLevelClass, introspectedTable, "offset");
         addLimit(topLevelClass, introspectedTable, "limit");

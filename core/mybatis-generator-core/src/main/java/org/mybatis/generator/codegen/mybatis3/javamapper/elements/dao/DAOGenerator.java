@@ -15,24 +15,25 @@
  */
 package org.mybatis.generator.codegen.mybatis3.javamapper.elements.dao;
 
-import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
 import static org.mybatis.generator.internal.util.messages.Messages.getString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.mybatis.generator.api.FullyQualifiedTable;
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.dom.java.CompilationUnit;
+import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
-import org.mybatis.generator.api.dom.java.Interface;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
+import org.mybatis.generator.api.dom.java.Method;
+import org.mybatis.generator.api.dom.java.Parameter;
+import org.mybatis.generator.api.dom.java.PrimitiveTypeWrapper;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.codegen.AbstractJavaClientGenerator;
 import org.mybatis.generator.codegen.AbstractXmlGenerator;
-import org.mybatis.generator.codegen.ibatis2.dao.elements.AbstractDAOElementGenerator;
-import org.mybatis.generator.codegen.ibatis2.dao.elements.UpdateByExampleParmsInnerclassGenerator;
-import org.mybatis.generator.config.PropertyRegistry;
-import org.mybatis.generator.internal.rules.Rules;
 
 /**
  * DAO generator for iBatis.
@@ -51,183 +52,146 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
         FullyQualifiedTable table = introspectedTable.getFullyQualifiedTable();
         progressCallback.startTask(getString(
                 "Progress.14", table.toString())); //$NON-NLS-1$
-        TopLevelClass topLevelClass = getTopLevelClassShell();
-        Interface interfaze = getInterfaceShell();
+//        TopLevelClass topLevelClass = getTopLevelClassShell();
+//        Interface interfaze = getInterfaceShell();
+//        
+//        addCountByExampleMethod(topLevelClass, interfaze);
+//        addDeleteByExampleMethod(topLevelClass, interfaze);
+//        addDeleteByPrimaryKeyMethod(topLevelClass, interfaze);
+//        addInsertMethod(topLevelClass, interfaze);
+//        addInsertSelectiveMethod(topLevelClass, interfaze);
+//        addSelectByExampleWithBLOBsMethod(topLevelClass, interfaze);
+//        addSelectByExampleWithoutBLOBsMethod(topLevelClass, interfaze);
+//        addSelectByPrimaryKeyMethod(topLevelClass, interfaze);
+//        addUpdateByExampleParmsInnerclass(topLevelClass, interfaze);
+//        addUpdateByExampleSelectiveMethod(topLevelClass, interfaze);
+//        addUpdateByExampleWithBLOBsMethod(topLevelClass, interfaze);
+//        addUpdateByExampleWithoutBLOBsMethod(topLevelClass, interfaze);
+//        addUpdateByPrimaryKeySelectiveMethod(topLevelClass, interfaze);
+//        addUpdateByPrimaryKeyWithBLOBsMethod(topLevelClass, interfaze);
+//        addUpdateByPrimaryKeyWithoutBLOBsMethod(topLevelClass, interfaze);
+        
+        Set<FullyQualifiedJavaType> importedTypes = new TreeSet<FullyQualifiedJavaType>();
+        importedTypes.add(new FullyQualifiedJavaType("org.springframework.stereotype.Service"));
+        FullyQualifiedJavaType type = new FullyQualifiedJavaType(
+                        introspectedTable.getMyBatis3JavaMapperType().replace("Mapper", "DAO"));
+        TopLevelClass topLevelClass = new TopLevelClass(type);
+        topLevelClass.setVisibility(JavaVisibility.PUBLIC);
+        topLevelClass.addAnnotation("@Service");
 
-        addCountByExampleMethod(topLevelClass, interfaze);
-        addDeleteByExampleMethod(topLevelClass, interfaze);
-        addDeleteByPrimaryKeyMethod(topLevelClass, interfaze);
-        addInsertMethod(topLevelClass, interfaze);
-        addInsertSelectiveMethod(topLevelClass, interfaze);
-        addSelectByExampleWithBLOBsMethod(topLevelClass, interfaze);
-        addSelectByExampleWithoutBLOBsMethod(topLevelClass, interfaze);
-        addSelectByPrimaryKeyMethod(topLevelClass, interfaze);
-        addUpdateByExampleParmsInnerclass(topLevelClass, interfaze);
-        addUpdateByExampleSelectiveMethod(topLevelClass, interfaze);
-        addUpdateByExampleWithBLOBsMethod(topLevelClass, interfaze);
-        addUpdateByExampleWithoutBLOBsMethod(topLevelClass, interfaze);
-        addUpdateByPrimaryKeySelectiveMethod(topLevelClass, interfaze);
-        addUpdateByPrimaryKeyWithBLOBsMethod(topLevelClass, interfaze);
-        addUpdateByPrimaryKeyWithoutBLOBsMethod(topLevelClass, interfaze);
+        importedTypes.add(new FullyQualifiedJavaType("org.springframework.beans.factory.annotation.Autowired"));
+        importedTypes.add(new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
+        
+        Field field = new Field();
+        field.setVisibility(JavaVisibility.PRIVATE);
+        field.setType(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+        field.setName(getMapperName()); //$NON-NLS-1$
+        field.addAnnotation("@Autowired");
+        topLevelClass.addField(field);
+        
+        importedTypes.add(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+        
+        topLevelClass.addImportedTypes(importedTypes);
+        
+        //方法
+        addSelectByPrimaryKeyMethod(topLevelClass, importedTypes);
+        addInsertMethood(topLevelClass, importedTypes);
+        addUpdateByPrimaryKeyMethod(topLevelClass, importedTypes);
+        addDeleteByPrimaryKeyMethod(topLevelClass, importedTypes);
 
         List<CompilationUnit> answer = new ArrayList<CompilationUnit>();
-        if (context.getPlugins().clientGenerated(interfaze,
+        if (context.getPlugins().modelExampleClassGenerated(
                 topLevelClass, introspectedTable)) {
             answer.add(topLevelClass);
-            answer.add(interfaze);
         }
 
         return answer;
     }
+    
+	private String getMapperName() {
+		String myBatis3JavaMapperType = introspectedTable.getMyBatis3JavaMapperType();
+		if (myBatis3JavaMapperType.indexOf(".") == -1)
+			return myBatis3JavaMapperType;
+		int start = myBatis3JavaMapperType.lastIndexOf(".") + 1;
+		return myBatis3JavaMapperType.substring(start, start + 1).toLowerCase() + myBatis3JavaMapperType.substring(start + 1, myBatis3JavaMapperType.length());
+	}
 
-    protected TopLevelClass getTopLevelClassShell() {
-        FullyQualifiedJavaType interfaceType = new FullyQualifiedJavaType(
-                introspectedTable.getDAOInterfaceType());
-        FullyQualifiedJavaType implementationType = new FullyQualifiedJavaType(
-                introspectedTable.getDAOImplementationType());
-
-
-        TopLevelClass answer = new TopLevelClass(implementationType);
-        answer.setVisibility(JavaVisibility.PUBLIC);
-
-        return answer;
-    }
-
-    protected Interface getInterfaceShell() {
-        Interface answer = new Interface(new FullyQualifiedJavaType(
-                introspectedTable.getDAOInterfaceType()));
-        answer.setVisibility(JavaVisibility.PUBLIC);
-
-        String rootInterface = introspectedTable
-                .getTableConfigurationProperty(PropertyRegistry.ANY_ROOT_INTERFACE);
-        if (!stringHasValue(rootInterface)) {
-            rootInterface = context.getJavaClientGeneratorConfiguration()
-                    .getProperty(PropertyRegistry.ANY_ROOT_INTERFACE);
-        }
-
-        if (stringHasValue(rootInterface)) {
-            FullyQualifiedJavaType fqjt = new FullyQualifiedJavaType(
-                    rootInterface);
-            answer.addSuperInterface(fqjt);
-            answer.addImportedType(fqjt);
-        }
-
-
-        context.getCommentGenerator().addJavaFileComment(answer);
-
-        return answer;
-    }
-
-    protected void addCountByExampleMethod(TopLevelClass topLevelClass,
-            Interface interfaze) {
-        if (introspectedTable.getRules().generateCountByExample()) {
-        }
-    }
-
-    protected void addDeleteByExampleMethod(TopLevelClass topLevelClass,
-            Interface interfaze) {
-        if (introspectedTable.getRules().generateDeleteByExample()) {
-        }
-    }
-
-    protected void addDeleteByPrimaryKeyMethod(TopLevelClass topLevelClass,
-            Interface interfaze) {
-        if (introspectedTable.getRules().generateDeleteByPrimaryKey()) {
-        }
-    }
-
-    protected void addInsertMethod(TopLevelClass topLevelClass,
-            Interface interfaze) {
-        if (introspectedTable.getRules().generateInsert()) {
-        }
-    }
-
-    protected void addInsertSelectiveMethod(TopLevelClass topLevelClass,
-            Interface interfaze) {
-        if (introspectedTable.getRules().generateInsertSelective()) {
-        }
-    }
-
-    protected void addSelectByExampleWithBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateSelectByExampleWithBLOBs()) {
-        }
-    }
-
-    protected void addSelectByExampleWithoutBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateSelectByExampleWithoutBLOBs()) {
-            
-        }
-    }
-
-    protected void addSelectByPrimaryKeyMethod(TopLevelClass topLevelClass,
-            Interface interfaze) {
+	protected void addSelectByPrimaryKeyMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
         if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+        	importedTypes.add(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+        	
+            Method method = new Method();
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("getById"); //$NON-NLS-1$
+            method.setReturnType(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+            List<IntrospectedColumn> introspectedColumns = introspectedTable
+                    .getPrimaryKeyColumns();
+            StringBuilder sb = new StringBuilder();
+            for (IntrospectedColumn introspectedColumn : introspectedColumns) {
+                FullyQualifiedJavaType type = introspectedColumn
+                        .getFullyQualifiedJavaType();
+                importedTypes.add(type);
+                Parameter parameter = new Parameter(type, introspectedColumn
+                        .getJavaProperty());
+                method.addParameter(parameter);
+                sb.append(",").append(parameter.getName());
+            }
+            sb.deleteCharAt(0);
+            method.addBodyLine("return " + getMapperName() + ".selectByPrimary(" + sb.toString() + ");"); //$NON-NLS-1$
+            topLevelClass.addMethod(method);
+        }
+    }
+    
+    protected void addInsertMethood(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+            Method method = new Method();
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("add"); //$NON-NLS-1$
+            method.setReturnType(PrimitiveTypeWrapper.getStringInstance());
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), "record"));
+            method.addBodyLine(getMapperName() + ".insert(record);"); 
+            method.addBodyLine("return null;"); //$NON-NLS-1$
+            topLevelClass.addMethod(method);
+        }
+    }
+    
+    protected void addUpdateByPrimaryKeyMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+            Method method = new Method();
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("update"); //$NON-NLS-1$
+            method.setReturnType(PrimitiveTypeWrapper.getStringInstance());
+            method.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()), "record"));
+            method.addBodyLine(getMapperName() + ".updateByPrimaryKey(record);");
+            method.addBodyLine("return null;"); //$NON-NLS-1$
+            topLevelClass.addMethod(method);
+        }
+    }
+    
+    protected void addDeleteByPrimaryKeyMethod(TopLevelClass topLevelClass, Set<FullyQualifiedJavaType> importedTypes) {
+        if (introspectedTable.getRules().generateSelectByPrimaryKey()) {
+            Method method = new Method();
+            method.setVisibility(JavaVisibility.PUBLIC);
+            method.setName("deleteById"); //$NON-NLS-1$
+            method.setReturnType(PrimitiveTypeWrapper.getStringInstance());
             
+            List<IntrospectedColumn> introspectedColumns = introspectedTable
+                    .getPrimaryKeyColumns();
+            StringBuilder sb = new StringBuilder();
+            for (IntrospectedColumn introspectedColumn : introspectedColumns) {
+                FullyQualifiedJavaType type = introspectedColumn
+                        .getFullyQualifiedJavaType();
+                importedTypes.add(type);
+                Parameter parameter = new Parameter(type, introspectedColumn
+                        .getJavaProperty());
+                method.addParameter(parameter);
+                sb.append(",").append(parameter.getName());
+            }
+            sb.deleteCharAt(0);
+            method.addBodyLine(getMapperName() + ".deleteByPrimaryKey(" + sb.toString() + ");");
+            method.addBodyLine("return null;"); //$NON-NLS-1$
+            topLevelClass.addMethod(method);
         }
-    }
-
-    protected void addUpdateByExampleParmsInnerclass(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        Rules rules = introspectedTable.getRules();
-        if (rules.generateUpdateByExampleSelective()
-                || rules.generateUpdateByExampleWithBLOBs()
-                || rules.generateUpdateByExampleWithoutBLOBs()) {
-            AbstractDAOElementGenerator methodGenerator =
-                    new UpdateByExampleParmsInnerclassGenerator();
-            initializeAndExecuteGenerator(methodGenerator, topLevelClass,
-                    interfaze);
-        }
-    }
-
-    protected void addUpdateByExampleSelectiveMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateUpdateByExampleSelective()) {
-            
-        }
-    }
-
-    protected void addUpdateByExampleWithBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateUpdateByExampleWithBLOBs()) {
-            
-        }
-    }
-
-    protected void addUpdateByExampleWithoutBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateUpdateByExampleWithoutBLOBs()) {
-            
-        }
-    }
-
-    protected void addUpdateByPrimaryKeySelectiveMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateUpdateByPrimaryKeySelective()) {
-            
-        }
-    }
-
-    protected void addUpdateByPrimaryKeyWithBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules().generateUpdateByPrimaryKeyWithBLOBs()) {
-            
-        }
-    }
-
-    protected void addUpdateByPrimaryKeyWithoutBLOBsMethod(
-            TopLevelClass topLevelClass, Interface interfaze) {
-        if (introspectedTable.getRules()
-                .generateUpdateByPrimaryKeyWithoutBLOBs()) {
-            
-        }
-    }
-
-    protected void initializeAndExecuteGenerator(
-            AbstractDAOElementGenerator methodGenerator,
-            TopLevelClass topLevelClass, Interface interfaze) {
-      
     }
 
     @Override
