@@ -48,9 +48,13 @@
 			      <property name="enableSubPackages" value="true" />
 			    </sqlMapGenerator>
 				
-				<javaClientGenerator type="XMLMAPPER" targetPackage="yike.dao" targetProject="自己的文件目录">  
+				<javaClientGenerator type="XMLMAPPER" targetPackage="yike.mapper" targetProject="自己的文件目录">  
 				  <property name="enableSubPackages" value="true" />
 				</javaClientGenerator>  
+
+				<javaClientDaoGenerator targetPackage="yike.dao" targetProject="自己的文件目录">  
+				  <property name="enableSubPackages" value="true" />
+				</javaClientDaoGenerator> 
 				
 			    <table tableName="promotion_info" domainObjectName="PromotionInfo" enableCountByExample="true" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="true" selectByExampleQueryId="true">
 			      <generatedKey column="id" sqlStatement="JDBC"/>
