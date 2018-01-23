@@ -1,5 +1,5 @@
 /**
- *    Copyright 2006-2017 the original author or authors.
+ *    Copyright 2006-2018 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.Properties;
 
 import org.mybatis.generator.config.Context;
 import org.mybatis.generator.config.GeneratedKey;
+import org.mybatis.generator.config.JavaClientDaoGeneratorConfiguration;
 import org.mybatis.generator.config.JavaClientGeneratorConfiguration;
 import org.mybatis.generator.config.JavaModelGeneratorConfiguration;
 import org.mybatis.generator.config.ModelType;
@@ -70,6 +71,7 @@ public abstract class IntrospectedTable {
         ATTR_MYBATIS3_JAVA_MAPPER_TYPE,
         /** used as XML Mapper namespace if no client is generated. */
         ATTR_MYBATIS3_FALLBACK_SQL_MAP_NAMESPACE,
+        ATTR_MYBATIS3_JAVA_DAO_TYPE,
         ATTR_FULLY_QUALIFIED_TABLE_NAME_AT_RUNTIME,
         ATTR_ALIASED_FULLY_QUALIFIED_TABLE_NAME_AT_RUNTIME,
         ATTR_COUNT_BY_EXAMPLE_STATEMENT_ID,
@@ -801,6 +803,21 @@ public abstract class IntrospectedTable {
 
         return sb.toString();
     }
+    
+    protected String calculateJavaClientDaoPackage() {
+        JavaClientDaoGeneratorConfiguration config = context
+                .getJavaClientDaoGeneratorConfiguration();
+        if (config == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(config.getTargetPackage());
+
+        sb.append(fullyQualifiedTable.getSubPackageForClientOrSqlMap(isSubPackagesEnabled(config)));
+
+        return sb.toString();
+    }
 
     protected void calculateJavaClientAttributes() {
         if (context.getJavaClientGeneratorConfiguration() == null) {
@@ -835,6 +852,21 @@ public abstract class IntrospectedTable {
             sb.append("Mapper"); //$NON-NLS-1$
         }
         setMyBatis3JavaMapperType(sb.toString());
+        
+        sb.setLength(0);
+        sb.append(calculateJavaClientDaoPackage());
+        sb.append('.');
+        if (stringHasValue(tableConfiguration.getMapperName())) {
+            sb.append(tableConfiguration.getMapperName());
+        } else {
+            if (stringHasValue(fullyQualifiedTable.getDomainObjectSubPackage())) {
+                sb.append(fullyQualifiedTable.getDomainObjectSubPackage());
+                sb.append('.');
+            }
+            sb.append(fullyQualifiedTable.getDomainObjectName());
+            sb.append("DAO"); //$NON-NLS-1$
+        }
+        setMyBatis3JavaDaoType(sb.toString());
 
         sb.setLength(0);
         sb.append(calculateJavaClientInterfacePackage());
@@ -1138,6 +1170,17 @@ public abstract class IntrospectedTable {
         internalAttributes.put(
                 InternalAttribute.ATTR_MYBATIS3_JAVA_MAPPER_TYPE,
                 mybatis3JavaMapperType);
+    }
+    
+    public String getMyBatis3JavaDaoType() {
+        return internalAttributes
+                .get(InternalAttribute.ATTR_MYBATIS3_JAVA_DAO_TYPE);
+    }
+
+    public void setMyBatis3JavaDaoType(String mybatis3JavaDaoType) {
+        internalAttributes.put(
+                InternalAttribute.ATTR_MYBATIS3_JAVA_DAO_TYPE,
+                mybatis3JavaDaoType);
     }
 
     public String getMyBatis3SqlProviderType() {

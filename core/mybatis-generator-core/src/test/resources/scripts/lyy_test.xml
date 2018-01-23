@@ -59,7 +59,7 @@
 		  <property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		
-		<javaClientDaoGenerator targetPackage="yike.dao" targetProject="MAVEN">  
+		<javaClientDaoGenerator targetPackage="yike.dao1" targetProject="MAVEN">  
 		  <property name="enableSubPackages" value="true" />
 		</javaClientDaoGenerator> 
 		

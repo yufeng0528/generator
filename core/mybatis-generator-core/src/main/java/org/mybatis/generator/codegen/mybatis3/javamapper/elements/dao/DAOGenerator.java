@@ -74,7 +74,7 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
         Set<FullyQualifiedJavaType> importedTypes = new TreeSet<FullyQualifiedJavaType>();
         importedTypes.add(new FullyQualifiedJavaType("org.springframework.stereotype.Service"));
         FullyQualifiedJavaType type = new FullyQualifiedJavaType(
-                        introspectedTable.getMyBatis3JavaMapperType().replace("Mapper", "DAO"));
+                        introspectedTable.getMyBatis3JavaDaoType());
         TopLevelClass topLevelClass = new TopLevelClass(type);
         topLevelClass.setVisibility(JavaVisibility.PUBLIC);
         topLevelClass.addAnnotation("@Service");
@@ -84,7 +84,7 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
         
         Field field = new Field();
         field.setVisibility(JavaVisibility.PRIVATE);
-        field.setType(new FullyQualifiedJavaType(introspectedTable.getBaseRecordType()));
+        field.setType(new FullyQualifiedJavaType(introspectedTable.getMyBatis3JavaMapperType()));
         field.setName(getMapperName()); //$NON-NLS-1$
         field.addAnnotation("@Autowired");
         topLevelClass.addField(field);
@@ -137,7 +137,7 @@ public class DAOGenerator extends AbstractJavaClientGenerator {
                 sb.append(",").append(parameter.getName());
             }
             sb.deleteCharAt(0);
-            method.addBodyLine("return " + getMapperName() + ".selectByPrimary(" + sb.toString() + ");"); //$NON-NLS-1$
+            method.addBodyLine("return " + getMapperName() + ".selectByPrimaryKey(" + sb.toString() + ");"); //$NON-NLS-1$
             topLevelClass.addMethod(method);
         }
     }
